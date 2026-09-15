@@ -3,7 +3,7 @@
 > **GBE = Generative Blender-to-Engine**
 > GBE-Studio 是**生产端**：把「多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地」做成一条可复用、可复现、可控成本的资产流水线。
 > 本文是**重构方案**，不复用 tbg-3d 的既有结构；tbg-3d 仅作为已验证的原型与经验来源（**只读归档，不迁移**，ADR-0001）。
-> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.2，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
+> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.3，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
 > **决策依据见 `gbe-assets/docs/DECISIONS.md`（ADR-0001 ~ ADR-0006）**：存量不迁移 · 不接 Rodin · 混元3D 三通道 · Unity 延后 · MCP 实现可切换 · 构件分级拼装。
 > **拆分工序见 [`docs/BUILDING-DECOMPOSITION.md`](./BUILDING-DECOMPOSITION.md)**（场景建筑拆分细化方案）。
 > Studio 精修与打包必须遵守共享约定；**禁止本地另立一套**。
@@ -719,4 +719,4 @@ GBE-Studio（生产端）
              GBE-Assets（仓储端）→ Web 浏览（含装配视图）/ REST API / 按引擎下载
 ```
 
-详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.2）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。
+详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.3）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。

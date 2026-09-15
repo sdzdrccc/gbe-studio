@@ -86,6 +86,15 @@ gbe-studio/
 │   └── fallback/                    应急链（重拓扑等无法自动复现时的人工/半自动路径）
 │
 ├── build/                   ⑤ 装配层 ★
+│   ├── procedural/          ★   程序化构件生成（零依赖，0 credit）
+│   │   ├── geom.js              参数化几何内核（box / cylinder / dome / extrude / swept-beam，非索引三角汤）
+│   │   ├── gltf.js              glTF 2.0 binary 写出 + 回读自检（accessor / material / 对齐）
+│   │   ├── render.js            纯 JS 软件光栅化预览（512×512 白底 3/4 视角 · 三点布光 · 投影阴影 · 手写 PNG）
+│   │   ├── material-colors.json 占位配色真源（引用本表的资产一律带 needs-material-review）
+│   │   ├── components.js        ★ 18 件程序化构件定义（BUILDING-DECOMPOSITION §9.2 标 P 的全部）
+│   │   ├── generate.js          生成器：几何 → 逐件自检 → 打包含盘 → 投递 inbox（--check / --only / --ss）
+│   │   ├── assemble.js          装配清单生成：按「谁插谁」求解坐标（不硬编码）→ §19.5 首跑 → 落 `assemblies/`
+│   │   └── verify.js            出包复验（调 gbe-assets 的 @gbe/schema 真源校验器，门禁双跑的第二次）
 │   └── templates/               参数化建筑模板
 │       └── tpl-hall-xieshan-double.json   歇山双檐殿堂（主殿 7 开间 / 配殿 5 开间 = 同模板两组参数）
 │
@@ -224,7 +233,7 @@ node engines/base.js probe godot         # 端口连通性
 | [`CHANGELOG.md`](CHANGELOG.md) | 更新日志 |
 | [`AGENTS.md`](AGENTS.md) | AI 助手在本仓的工作纪律 |
 | `../gbe-assets/docs/DECISIONS.md` | ★ 决策台账（ADR-0001 ~ 0006） |
-| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.2 |
+| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.3 |
 
 ---
 

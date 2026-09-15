@@ -19,6 +19,38 @@
 
 ## [未发布]
 
+## [0.4.0] - 2026-09-15
+
+### 新增
+
+- **程序化构件生成器**（`build/procedural/`，零依赖、0 credit）：把 BUILDING-DECOMPOSITION §9.2 里标 **P** 的构件全部做出来 —— **18 件**（原方案表记 17，实为 18，已勘误）
+  - `geom.js` 参数化几何内核：box / cylinder / dome / extrude（含耳切三角化）/ swept-beam（带起拱，两端底面精确落 y=0）；非索引三角形汤 + 逐三角法线
+  - `gltf.js` glTF 2.0 binary 写出器与回读自检（accessor min/max、material 引用、4 字节对齐）
+  - `render.js` 纯 JS 软件光栅化预览：512×512 白底 3/4 视角、**跟随相机的三点布光**、投影阴影、2× 超采样、手写 PNG
+  - `material-colors.json` 占位配色真源（引用者一律带 `needs-material-review`）
+  - `components.js` 18 件定义：台基 4 · 柱网 1 · 梁架 3 · 墙 2 · 屋顶 6 · 栏杆 1 · 装饰 1
+  - `generate.js` 生成器：几何 → 逐件自检（插槽落定位网格 / 水平尺寸落造型网格 / 底面 y=0 / 面数预算 / 材质引用 / glb 回读三角数 / 预览 512）→ 打包含 `asset.json` + `source.json` + `preview.png` → 投递 `inbox/<id>@<version>/`（`--check` / `--only` / `--out` / `--no-preview` / `--ss`）
+  - `verify.js` 出包复验：调 `gbe-assets` 的 `@gbe/schema` 真源校验器，不另起第二套语法校验
+- **装配清单生成器**（`build/procedural/assemble.js`）：按「谁插谁」的配方**求解坐标**（`position = 宿主插槽世界坐标 − R·本件插槽局部坐标`），**不硬编码任何坐标**；插槽定义从**已入库的实体**读取（顺手验证 intake 落盘）；生成后跑 §19.5 首跑校验，通过才落盘
+- 首份装配清单 `cn-ancient.assembly.wanan-wall-corner-a`：转角墙墩 + 两向直墙（3 段）+ 望柱 + 门钉，6 实例 / 4 种构件 / 5 处对接 / 324 面
+
+### 变更
+
+- `docs/BUILDING-DECOMPOSITION.md`：
+  - 修正 §9.2 算术 —— 路线分布 **P 17→18 · A 25→24**（附逐行勘误）、预算估算 915 → **885 credit**、批 1 交付 37 → **38 件**
+  - 新增「转角件为什么是墩而不是 L 形墙」的裁决说明（L 形翼厚 0.5 m 在契约下不可自洽）
+  - 新增「批 1 程序化部分 · 实施进展」表，并注明**这一步证实的是「可装配」而不是「够用」**
+  - §1.2(a) 成本表补**警示框**：按该表口径 25 栋时生成 credit 仍高于逐栋（2385 vs 1375），回本靠复用带来的精修 / LOD / 材质免重做——成本模型折算工时后待重算，不假装已算过
+- README：结构树补 `build/procedural/` 全貌（8 个文件）；CONVENTIONS 版本引用 v1.2 → v1.3
+- `docs/PLAN.md` 的 CONVENTIONS 版本引用同步至 v1.3
+
+### 验收
+
+- **18/18 通过出包门禁**：0 错误 · 1 软警告（`gable-board-a` 板厚 0.1 未落 0.25 造型网格——薄板天然如此，如实报告比骗零警告诚实）
+- **同一配方重复执行统计一致**（批 1 验收点 / DoD §17.2）：两次独立生成 + 与已入库件**三方逐字节比对**，18 件的 glb 与 preview 全部一致；`recipe_hash` 18 件各不相同
+- **装配清单门禁双跑**：studio 侧首跑 + assets 侧 `assembly-check` 复跑，均 0 错误 0 警告
+- 构件级冒烟 37/37 · 装配级冒烟 27/27 未回归
+
 ## [0.3.1] - 2026-09-15
 
 ### 变更

@@ -1,0 +1,35 @@
+{
+  "$comment": "★ primitive 层的占位配色。真实材质（贴图 + PBR 参数）归 assets 的 materials/ 素材库（尚未建立）。本表现仅用于：① preview.png 渲染 ② glb 的 baseColorFactor 兜底。凡引用本表的资产一律带 needs-material-review 标记。禁止把颜色写进代码。",
+  "colors_version": "1",
+  "srgb": true,
+  "groups": {
+    "roof-tile": {
+      "qingwa": "#5d6369",
+      "liuli-huang": "#d9a12c",
+      "liuli-lu": "#2f8a4a",
+      "tongwa-hui": "#74787c"
+    },
+    "timber": {
+      "hong-mu": "#6b2e22",
+      "zhu-hong": "#a8342a",
+      "ben-se": "#9c7850",
+      "hei-qi": "#1c1c1f"
+    },
+    "stone": {
+      "qing-shi": "#8b908e",
+      "bai-shi": "#cbc8bf",
+      "han-bai-yu": "#e4e2db"
+    },
+    "metal": {
+      "tong-liu-jin": "#d4a94a",
+      "tie-hei": "#33343a"
+    },
+    "earth": {
+      "hang-tu": "#a89066",
+      "qing-zhuan": "#8b9194"
+    },
+    "textile": {
+      "zhu-lian": "#99382f"
+    }
+  }
+}
