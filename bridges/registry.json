@@ -6,9 +6,10 @@
   "ports_version": "1",
   "authority": "gbe-assets/catalog/ports.json",
   "summary": {
-    "total": 9,
-    "owned_by_studio": 7,
+    "total": 10,
+    "owned_by_studio": 8,
     "active": 6,
+    "reserved": 1,
     "deferred": 1,
     "owned_by_assets": 2
   },
@@ -50,6 +51,16 @@
       "required": false
     }
   },
+  "reserved_ports": {
+    "unreal-mcp-official": {
+      "port": 8000,
+      "protocol": "http",
+      "purpose": "UE 5.8+ 官方 Unreal MCP 插件（嵌在编辑器进程内，本地回环 /mcp）",
+      "required": false,
+      "status": "reserved",
+      "note": "ADR-0007：官方实现已进 mcp.json 但【不预设首选】。8000 为通用端口，冲突风险高 —— 启用前必须探测占用；若官方插件端口可配置，优先改到非通用端口。"
+    }
+  },
   "deferred_ports": {
     "unity-mcp": {
       "port": 8080,
@@ -81,7 +92,8 @@
       6776,
       30010,
       8091,
-      55557
+      55557,
+      8000
     ],
     "unity": [
       8080

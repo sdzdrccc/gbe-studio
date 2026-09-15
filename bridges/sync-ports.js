@@ -34,7 +34,12 @@ function readSource() {
 function buildView(source) {
   const mine = source.ports.filter((p) => p.owner === 'gbe-studio');
   const others = source.ports.filter((p) => p.owner !== 'gbe-studio');
-  const active = mine.filter((p) => p.status !== 'deferred');
+  // 三类状态（ADR-0007）：
+  //   无 status  = 已启用
+  //   reserved   = 已登记但未启用（如官方 MCP 的 8000）—— 保留占位以免被他人占用
+  //   deferred   = 整个引擎延后（ADR-0004 Unity）
+  const active = mine.filter((p) => !p.status);
+  const reserved = mine.filter((p) => p.status === 'reserved');
   const deferred = mine.filter((p) => p.status === 'deferred');
 
   return {
@@ -51,12 +56,21 @@ function buildView(source) {
       total: source.ports.length,
       owned_by_studio: mine.length,
       active: active.length,
+      reserved: reserved.length,
       deferred: deferred.length,
       owned_by_assets: others.length,
     },
 
-    // 本仓占用的端口（按 id 索引，便于 health.js / install-mcp.js 查）
+    // 本仓【已启用】的端口（按 id 索引，便于 health.js / install-mcp.js 查）
     studio_ports: Object.fromEntries(active.map((p) => [p.id, { port: p.port, protocol: p.protocol, purpose: p.purpose, required: !!p.required }])),
+
+    // 已登记但【未启用】的端口（如官方 MCP 的 8000，ADR-0007）—— 保留占位以免被他人占用
+    reserved_ports: Object.fromEntries(
+      reserved.map((p) => [
+        p.id,
+        { port: p.port, protocol: p.protocol, purpose: p.purpose, required: !!p.required, status: p.status, note: p.note || null },
+      ])
+    ),
 
     // 延后占用（Unity MCP 8080 等）—— 保留以免将来冲突
     deferred_ports: Object.fromEntries(
@@ -66,11 +80,12 @@ function buildView(source) {
     // 非本仓占用（assets 服务端口）—— 只读参考，启动前也需避让
     reserved_by_others: Object.fromEntries(others.map((p) => [p.id, { port: p.port, owner: p.owner, purpose: p.purpose }])),
 
-    // 按引擎维度的端口分组，供 MCP 切换时复检
+    // 按引擎维度的端口分组：回答「切到该引擎的某个实现时，哪些端口必须让开」
+    // unreal 含 active + reserved —— reserved 的实现一旦被选为 active 就要占用该端口
     by_engine: {
       blender: active.filter((p) => p.id === 'blender-mcp').map((p) => p.port),
       godot: active.filter((p) => p.id === 'godot-mcp').map((p) => p.port),
-      unreal: active.filter((p) => p.id.startsWith('unreal')).map((p) => p.port),
+      unreal: [...active, ...reserved].filter((p) => p.id.startsWith('unreal')).map((p) => p.port),
       unity: deferred.filter((p) => p.id === 'unity-mcp').map((p) => p.port),
     },
   };
@@ -98,9 +113,18 @@ async function probe(view) {
     const mark = state === 'listening' ? '● 已占用' : state === 'free' ? '○ 空闲' : '- 未知';
     console.log(`  ${String(info.port).padStart(5)}  ${id.padEnd(32)} ${mark}`);
   }
+  const reserved = Object.entries(view.reserved_ports || {});
+  if (reserved.length) {
+    console.log('  预留（未启用；一旦选为 active 就必须空闲，故现在也要避让）：');
+    for (const [id, info] of reserved) {
+      const state = await tryConnect(info.port, info.protocol);
+      const mark = state === 'listening' ? '● 已被占用 ← 启用前需解决' : state === 'free' ? '○ 空闲' : '- 未知';
+      console.log(`  ${String(info.port).padStart(5)}  ${id.padEnd(32)} ${mark}`);
+    }
+  }
 }
 
-function main(argv) {
+async function main(argv) {
   const check = argv.includes('--check');
   const doProbe = argv.includes('--probe');
 
@@ -128,10 +152,12 @@ function main(argv) {
   fs.writeFileSync(TARGET, serialized);
   console.log(`✓ 已从真源生成 ${path.relative(ROOT, TARGET)}`);
   console.log(`  真源：gbe-assets/catalog/ports.json（updated_at=${source.updated_at}）`);
-  console.log(`  本仓启用端口 ${view.summary.active} 个，延后 ${view.summary.deferred} 个，避让他仓 ${view.summary.owned_by_assets} 个`);
+  console.log(
+    `  本仓启用端口 ${view.summary.active} 个，预留(未启用) ${view.summary.reserved} 个，延后 ${view.summary.deferred} 个，避让他仓 ${view.summary.owned_by_assets} 个`
+  );
 
   if (doProbe) {
-    probe(view).then(() => process.exit(0));
+    await probe(view);
   } else {
     console.log('  提示：加 --probe 可探测端口占用；加 --check 可在 CI 校验视图未过期。');
   }
@@ -141,5 +167,13 @@ function main(argv) {
 module.exports = { readSource, buildView, SOURCE, TARGET };
 
 if (require.main === module) {
-  process.exit(main(process.argv.slice(2)));
+  // main 可能是 async（--probe 分支）—— 必须等它，不能直接 process.exit(返回值)。
+  // 旧写法 `process.exit(main(...))` 会在异步探测完成前就杀掉进程，导致 --probe 静默无输出。
+  Promise.resolve(main(process.argv.slice(2))).then(
+    (code) => process.exit(code),
+    (err) => {
+      console.error(`✗ sync-ports 失败：${err && err.stack ? err.stack : err}`);
+      process.exit(2);
+    }
+  );
 }

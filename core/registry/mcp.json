@@ -1,12 +1,25 @@
 {
-  "$comment": "★ MCP 实现注册表（CONVENTIONS §20.3 为其人类可读镜像）—— ADR-0005：MCP 实现【不固定】，「引擎 × 实现」多对多，运行时切换。active=null 表示尚未选择，由 gbe-set 引导。切换命令：gbe-engine mcp use <engine> <impl-id>。",
-  "registry_version": "1",
+  "$comment": "★ MCP 实现注册表（CONVENTIONS §20.3 为其人类可读镜像）—— ADR-0005：MCP 实现【不固定】，「引擎 × 实现」多对多，运行时切换。active=null 表示尚未选择，由 gbe-set 引导。切换命令：gbe-engine mcp use <engine> <impl-id>。ADR-0007 新增 source / engine_version_range / maturity 三维度，用于表达「官方 vs 社区」的取舍。",
+  "registry_version": "2",
   "updated_at": "2026-09-15",
+  "field_notes": {
+    "source": "first-party = 引擎厂商随引擎发布（跟引擎同生命周期）；community = 第三方项目（依赖维护者）",
+    "engine_version_range": "SemVer 区间串；null = 【未核实】，不等于「无限制」（ADR-0007）",
+    "maturity": "experimental | beta | stable | unknown；unknown = 未核实，【不允许替它猜一个看起来体面的值】（ADR-0007）",
+    "verified_at": "信息核对时间（桌面核查），【非上机实测】；上机验证状态见 semantic_map 的 status"
+  },
   "selection_policy": {
     "$comment": "不预设首选。gbe-set 列出候选、说明 requirements 与 supports 差异，由用户选择。",
     "preselect": false,
     "show_capability_diff": true,
-    "verify_ports_on_switch": true
+    "verify_ports_on_switch": true,
+    "filter_by_engine_version": true,
+    "preference_rules": [
+      "① 先按 engine_version_range 过滤掉与当前引擎版本不兼容的实现（null 视为未核实，保留但需提示）",
+      "② 要长期稳定、或要让 8 个语义动作由自己掌控 → 倾向 source=first-party（代价：需自行实现 Toolset）",
+      "③ 要零编译、或引擎版本低于官方支持区间 → 倾向 community",
+      "④ 以上均为【偏好提示】，不自动选定；最终由用户决定（ADR-0005 preselect=false 不变）"
+    ]
   },
   "engines": {
     "godot": {
@@ -16,6 +29,9 @@
           "id": "yanhuifair-godot-mcp",
           "display_name": "@yanhuifair/godot-mcp",
           "repo": "@yanhuifair/godot-mcp",
+          "source": "community",
+          "maturity": "unknown",
+          "engine_version_range": null,
           "transport": "tcp",
           "ports": [9876],
           "tool_count": 386,
@@ -32,9 +48,45 @@
       "active": null,
       "implementations": [
         {
+          "id": "unreal-official-mcp",
+          "display_name": "Epic 官方 Unreal MCP 插件",
+          "repo": "内置（Engine 自带 Experimental 插件 ModelContextProtocol）",
+          "source": "first-party",
+          "maturity": "experimental",
+          "engine_version_range": ">=5.8",
+          "transport": "http",
+          "ports": [8000],
+          "endpoint": "http://127.0.0.1:8000/mcp",
+          "tool_count": null,
+          "install": "UE 5.8+ 编辑器内启用内置 Unreal MCP 插件 + AllToolsets 插件（无需第三方依赖）",
+          "requirements": [
+            "UE 5.8 及以上（5.8 是 UE5 计划内最后一个版本；5.3–5.7 官方零支持）",
+            "启用内置 Unreal MCP 插件（Experimental）+ AllToolsets 插件",
+            "★ 需自行编写 GBE Toolset（C++ 或 Python，继承 UToolsetDefinition）才有可映射的工具名"
+          ],
+          "availability": "UE 5.8 起内置；Epic 明示 UE6 将把 MCP 做成一等公民（目标 2027 底 Early Access）",
+          "semantic_map": null,
+          "semantic_map_blocked_by": "官方插件暴露的是引擎操作工具（actor / 蓝图 / 材质 / Niagara / Sequencer），不含 GBE 的 8 个语义动作；需先实现 GBE Toolset 才有可映射的工具名。【阻塞是「工具还不存在」，不是「还没查」】—— 故不写全 null 的空壳映射表（ADR-0007 第 4 条）",
+          "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify", "undo"],
+          "supports_basis": "design-complete",
+          "supports_note": "【设计上齐全】：Toolset 由我们自己实现，不受第三方工具面限制，8 个动作理论上都能有。但在 Toolset 落地前【实际可用为 0】—— 适配器必须据此明确报告能力缺失，不得当作已验证可用。",
+          "security": {
+            "bind": "127.0.0.1（本地回环）",
+            "auth": "【无认证层】—— 仅限本机使用，禁止暴露到网络",
+            "permission_gate": "编辑器偏好内可配置 AI 权限与自动启动服务"
+          },
+          "notes": "与引擎同发布周期，不会因社区弃坑失效；可用 ModelContextProtocol.GenerateClientConfig 生成客户端配置。加新工具需【重启编辑器】（Live Coding 拾取不到）。端口 8000 为通用端口，启用前须探测占用。",
+          "recommend_for": "UE 5.8+ 且要长期稳定 / 想让 8 个语义动作由自己掌控",
+          "verified_at": null,
+          "verification_note": "信息来自 2026-09 官方发布说明与社区文档，【未上机实测】"
+        },
+        {
           "id": "sam-david-unreal-mcp",
           "display_name": "sam-david/unreal-mcp",
           "repo": "https://github.com/sam-david/unreal-mcp",
+          "source": "community",
+          "maturity": "unknown",
+          "engine_version_range": null,
           "transport": "udp+http",
           "ports": [6776, 30010],
           "tool_count": 127,
@@ -42,13 +94,16 @@
           "install": "无需编译 C++ 插件 —— 零编译路线",
           "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify", "undo"],
           "notes": "4 个传输层；装机门槛最低，与 Godot/Unity 路线一样『装完即用』",
-          "recommend_for": "不想碰 C++ 的机器",
+          "recommend_for": "不想碰 C++ 的机器 / 引擎版本低于 5.8",
           "verified_at": "2026-09"
         },
         {
           "id": "chir24-unreal-mcp",
           "display_name": "ChiR24/Unreal_mcp",
           "repo": "https://github.com/ChiR24/Unreal_mcp",
+          "source": "community",
+          "maturity": "unknown",
+          "engine_version_range": null,
           "transport": "ws",
           "ports": [8091],
           "tool_count": 36,
@@ -62,6 +117,9 @@
           "id": "aadeshrao123-unreal-mcp",
           "display_name": "aadeshrao123/Unreal-MCP + ue-cli",
           "repo": "https://github.com/aadeshrao123/Unreal-MCP",
+          "source": "community",
+          "maturity": "unknown",
+          "engine_version_range": null,
           "transport": "tcp",
           "ports": [55557],
           "tool_count": 230,
@@ -81,6 +139,9 @@
           "id": "blender-mcp",
           "display_name": "blender-mcp",
           "repo": "blender-mcp",
+          "source": "community",
+          "maturity": "unknown",
+          "engine_version_range": null,
           "transport": "tcp",
           "ports": [9877],
           "requirements": ["Blender addon 启用"],

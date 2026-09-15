@@ -19,6 +19,26 @@
 
 ## [未发布]
 
+## [0.5.0] - 2026-09-15
+
+### 新增
+
+- **`core/registry/mcp.json` 接入官方实现**：新增 `unreal-official-mcp`（`source: "first-party"`，UE 5.8+，HTTP 8000，`maturity: "experimental"`）—— **不预设首选**，`preselect: false` 不变。
+- **注册表新增三个维度**（ADR-0007）：`source` / `engine_version_range` / `maturity`，并回填全部既有实现。`selection_policy` 增 `filter_by_engine_version` 与 `preference_rules`。
+- 官方实现的 `semantic_map` 显式置 `null` + `semantic_map_blocked_by`：官方插件暴露的是**引擎操作工具**（actor / 蓝图 / 材质 / Niagara / Sequencer），**不含 8 个语义动作**，需先自写 GBE Toolset（继承 `UToolsetDefinition`）。**阻塞是「工具还不存在」，不是「还没查」** —— 故不写空壳映射表。
+- `semantic_map` 新增 `supports_basis: "design-complete"` 语义：设计上齐全，但落地前**实际可用为 0**，适配器必须如实报告。
+- `core/registry/engines.json`：`unreal.ports` 增 `unreal-mcp-official` + `mcp_note`。
+
+### 修复
+
+- **`bridges/sync-ports.js`：`--probe` 从未产出过任何输出。** 根因是 `process.exit(main(process.argv.slice(2)))` —— `main()` 是同步函数、返回 0，而 `process.exit` 在异步探测完成前就把进程杀了（探测头一行打印后即无输出）。改为 `main` 支持 async + `Promise.resolve(...).then(code => process.exit(code))`。**这个 bug 从建立该脚本起就存在。**
+- **`bridges/sync-ports.js`：`reserved` 端口被误算进「已启用」。** 原判断为 `status !== 'deferred'` 即算启用，导致新登记的预留端口 8000 进了 `studio_ports` 并被计入 `summary.active`。现按三态分类（省略 / `reserved` / `deferred`），新增 `reserved_ports` 分组与 `summary.reserved`；`by_engine.unreal` 含 active + reserved（切实现时它们都必须空闲）；`--probe` 也探测预留端口并提示「启用前需解决」。
+
+### 文档
+
+- `docs/PLAN.md`：§7.2 补 ADR-0007 说明、官方实现条目与新增规则 6~8；§7.3 端口表增 8000 行；同步 CONVENTIONS 版本引用至 v1.4。
+- `README.md`：端口表增官方 MCP 预留行；决策台账范围更新为 ADR-0001 ~ 0007。
+
 ## [0.4.1] - 2026-09-15
 
 ### 新增

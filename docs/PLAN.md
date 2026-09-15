@@ -3,8 +3,8 @@
 > **GBE = Generative Blender-to-Engine**
 > GBE-Studio 是**生产端**：把「多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地」做成一条可复用、可复现、可控成本的资产流水线。
 > 本文是**重构方案**，不复用 tbg-3d 的既有结构；tbg-3d 仅作为已验证的原型与经验来源（**只读归档，不迁移**，ADR-0001）。
-> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.3，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
-> **决策依据见 `gbe-assets/docs/DECISIONS.md`（ADR-0001 ~ ADR-0006）**：存量不迁移 · 不接 Rodin · 混元3D 三通道 · Unity 延后 · MCP 实现可切换 · 构件分级拼装。
+> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.4，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
+> **决策依据见 `gbe-assets/docs/DECISIONS.md`（ADR-0001 ~ ADR-0007）**：存量不迁移 · 不接 Rodin · 混元3D 三通道 · Unity 延后 · MCP 实现可切换 · 构件分级拼装 · 官方 MCP 进注册表但不预设首选。
 > **拆分工序见 [`docs/BUILDING-DECOMPOSITION.md`](./BUILDING-DECOMPOSITION.md)**（场景建筑拆分细化方案）。
 > Studio 精修与打包必须遵守共享约定；**禁止本地另立一套**。
 
@@ -199,6 +199,7 @@
   "plan_id": "imp-20260915-0003",
   "engine": "unreal",
   "mcp_impl": "sam-david-unreal-mcp",   // ★ 指定实现（可切换，ADR-0005）；缺省则用注册表的 active
+                                        //   候选含官方实现 unreal-official-mcp（UE 5.8+，ADR-0007）
   "target": { "project": "F:/zxc/Project/WananCity", "map": "/Game/Maps/WananCity" },
   "asset": {
     "id": "cn-ancient.roof.xuanshan-single-a",
@@ -401,9 +402,11 @@ balance_after / balance_source   -- 余额来源：主账号 / 子账号 / CLI O
 
 > **坐标契约**（CONVENTIONS §1）：交付基准永远是 `+Y up / -Z forward / 米`。引擎差异只在三处体现——**单位缩放**（UE ×100）、**水平朝向**、**up 轴**（由引擎自己的导入器 Y→Z，我们不碰）。
 
-### 7.2 引擎注册表与 MCP 实现（★ 不固定，ADR-0005）
+### 7.2 引擎注册表与 MCP 实现（★ 不固定，ADR-0005 / ADR-0007）
 
 **核心变化：不再给每个引擎指定唯一 MCP，而是「引擎 × 实现」多对多，运行时切换。**
+
+> **ADR-0007 补充**：UE 5.8 起官方 MCP 插件内置，注册表新增 **`source` / `engine_version_range` / `maturity`** 三个维度以表达「官方 vs 社区」的取舍；官方实现进注册表但**不预设首选**。
 
 `core/registry/mcp.json`：
 
@@ -423,14 +426,26 @@ balance_after / balance_source   -- 余额来源：主账号 / 子账号 / CLI O
   "unreal": {
     "active": null,
     "implementations": [
+      // ★ first-party（ADR-0007）：UE 5.8 起内置，Experimental，本地回环端口 8000
+      //    注意 semantic_map: null = 「工具尚不存在」而非「还没填」—— 需先自写 GBE Toolset
+      { "id": "unreal-official-mcp", "repo": "内置（Engine Experimental 插件）",
+        "source": "first-party", "maturity": "experimental", "engine_version_range": ">=5.8",
+        "transport": "http", "ports": [8000], "tool_count": null,
+        "requirements": ["UE 5.8+", "启用内置 Unreal MCP 插件 + AllToolsets",
+                         "★ 自写 GBE Toolset（继承 UToolsetDefinition）才有可映射工具名"],
+        "semantic_map": null, "supports_basis": "design-complete",
+        "verified_at": null, "verification_note": "未上机实测" },
       { "id": "sam-david-unreal-mcp", "repo": "sam-david/unreal-mcp",
+        "source": "community", "maturity": "unknown", "engine_version_range": null,
         "transport": "udp+http", "ports": [6776, 30010], "tool_count": 127,
         "requirements": ["内置 Python Editor Script 插件", "Remote Control 插件"],
         "note": "零编译路线，无需 C++ 插件", "verified_at": "2026-09" },
       { "id": "chir24-unreal-mcp", "repo": "ChiR24/Unreal_mcp",
+        "source": "community", "maturity": "unknown", "engine_version_range": null,
         "transport": "ws", "port": 8091, "tool_count": 36,
         "requirements": ["C++ 插件"], "verified_at": "2026-09" },
       { "id": "aadeshrao123-unreal-mcp", "repo": "aadeshrao123/Unreal-MCP + ue-cli",
+        "source": "community", "maturity": "unknown", "engine_version_range": null,
         "transport": "tcp", "port": 55557, "tool_count": 230,
         "requirements": ["C++ 插件"], "verified_at": "2026-09" }
     ]
@@ -452,6 +467,9 @@ balance_after / balance_source   -- 余额来源：主账号 / 子账号 / CLI O
 3. **能力差异显式声明**：实现声明 `supports: []`；缺某语义动作时，适配器**明确告知能力缺失**并给替代路径，不静默失败。
 4. Bridge Router（Phase 4）聚合的是**语义面**而非实现面，因此**换实现不影响 Router**。
 5. **不预设首选**：`active: null` 时 `gbe-set` 列出候选、说明各家的 requirements 与能力差异，由用户选择。
+6. **三维度取舍**（ADR-0007）：先按 `engine_version_range` 过滤；要长期稳定、或要让 8 个语义动作由自己掌控 → 倾向 `first-party`（代价：得写 Toolset）；要零编译、或引擎版本低于官方支持区间 → 倾向 `community`。**均为偏好提示，不自动选定。**
+7. **`maturity` 不得因「官方」而上调**：官方实现当前标 `experimental`（Epic 自述 API 与格式可能变化、不建议用于生产）；`unknown` 表示未核实，**禁止替它猜一个体面的值**。
+8. **`semantic_map: null` 不许用空壳映射表代替**：官方插件暴露的是引擎操作工具（actor / 蓝图 / 材质 / Niagara / Sequencer），**不含** 8 个语义动作，必须**先实现 GBE Toolset**。写一份全 `null` 的空壳会掩盖「要写实现」与「要填映射」这两种完全不同的工作量。
 
 > **Unity 延后**（ADR-0004）：`unity` 在 `core/registry/engines.json` 中 `status: "deferred"`，注册表中不列实现；`gbe derive --engine unity` **明确报错**"引擎未启用"，不静默跳过。
 
@@ -465,6 +483,7 @@ balance_after / balance_source   -- 余额来源：主账号 / 子账号 / CLI O
 | Unreal Remote Control API | 30010 | HTTP |
 | Unreal（备选实现 ChiR24） | 8091 | WS，仅该实现启用时占用 |
 | Unreal（备选实现 aadeshrao123） | 55557 | TCP，仅该实现启用时占用 |
+| **Unreal 官方 MCP（预留）** | **8000** | HTTP，UE 5.8+ 内置（ADR-0007）。**已登记但未启用**；属通用端口，启用前必须探测占用 |
 | **Unity MCP（预留）** | 8080 | **延后，当前不占用**（ADR-0004） |
 | gbe-assets API | 8788 | 见 assets 方案 |
 | gbe-assets Web | 8789 | 见 assets 方案 |
@@ -719,4 +738,4 @@ GBE-Studio（生产端）
              GBE-Assets（仓储端）→ Web 浏览（含装配视图）/ REST API / 按引擎下载
 ```
 
-详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.3）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。
+详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.4）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。

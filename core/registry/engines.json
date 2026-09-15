@@ -41,10 +41,11 @@
       "order": 20,
       "adapter": "engines/unreal",
       "semantic_map": "engines/unreal/semantic_map.json",
-      "ports": ["unreal-python-remote-exec", "unreal-remote-control", "unreal-mcp-alt-chir24", "unreal-mcp-alt-aadeshrao123"],
+      "ports": ["unreal-python-remote-exec", "unreal-remote-control", "unreal-mcp-official", "unreal-mcp-alt-chir24", "unreal-mcp-alt-aadeshrao123"],
       "requires": ["内置 Python Editor Script 插件", "Remote Control 插件"],
       "axis": { "unit_scale": 100, "horizontal_rotation_deg": 0, "up_axis_handled_by": "engine-importer" },
-      "note": "轴转换只做 ① 单位缩放 ×100 ② 水平朝向 ③ 材质重映射；up 轴 Y→Z 由 UE 导入器负责，集成层不得重复转。"
+      "note": "轴转换只做 ① 单位缩放 ×100 ② 水平朝向 ③ 材质重映射；up 轴 Y→Z 由 UE 导入器负责，集成层不得重复转。",
+      "mcp_note": "ADR-0007：UE 5.8 起内置官方 MCP 插件（first-party，端口 8000），已进 mcp.json 但不预设首选；官方实现需自写 GBE Toolset 才有语义动作可映射。"
     },
     {
       "id": "unity",

@@ -219,6 +219,7 @@ node engines/base.js probe godot         # 端口连通性
 | Godot 编辑器桥 | 9876（写死不可改） |
 | Unreal Python Remote Exec / Remote Control | 6776 (UDP) / 30010 |
 | Unreal 备选实现 | 8091 / 55557（仅选中该实现时占用） |
+| **Unreal 官方 MCP（预留）** | **8000**（UE 5.8+ 内置，**已登记未启用**，ADR-0007） |
 | ~~Unity MCP~~ | 8080（**延后，当前不占用**） |
 
 > **端口真源不在这里** —— 在 `gbe-assets/catalog/ports.json`。本仓 `bridges/registry.json` 是从它生成的**只读视图**。改端口请改真源，再跑 `node bridges/sync-ports.js`。
@@ -233,8 +234,8 @@ node engines/base.js probe godot         # 端口连通性
 | [`docs/BUILDING-DECOMPOSITION.md`](docs/BUILDING-DECOMPOSITION.md) | ★ 场景建筑拆分细化方案（分层 / 模数 / 两条产线 / 粒度判据 / 万安城排期） |
 | [`CHANGELOG.md`](CHANGELOG.md) | 更新日志 |
 | [`AGENTS.md`](AGENTS.md) | AI 助手在本仓的工作纪律 |
-| `../gbe-assets/docs/DECISIONS.md` | ★ 决策台账（ADR-0001 ~ 0006） |
-| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.3 |
+| `../gbe-assets/docs/DECISIONS.md` | ★ 决策台账（ADR-0001 ~ 0007） |
+| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.4 |
 
 ---
 
