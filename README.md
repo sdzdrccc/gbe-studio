@@ -137,6 +137,7 @@ gbe-studio/
 | 版本号**真源** | [`VERSION`](VERSION)（单行 `MAJOR.MINOR.PATCH`） |
 | 变更内容**真源** | [`CHANGELOG.md`](CHANGELOG.md) |
 | 版本**镜像** | `package.json` 的 `version`（由脚本同步，不许手改） |
+| 版本**git 锚点** | 附注 tag `vX.Y.Z`（说明取自 CHANGELOG 该版本正文） |
 
 ```bash
 node scripts/version.js show                  # 当前版本
@@ -145,9 +146,22 @@ node scripts/version.js bump patch "修了 X" "调了 Y"   # 升版本 + 写日�
 node scripts/version.js bump minor --dry-run "只预览不落盘"
 node scripts/version.js check                 # ★ 一致性校验（推送前必过）
 node scripts/version.js sync                  # 只对齐镜像，不动版本、不写日志
+node scripts/version.js tag                   # 提交后打附注 tag vX.Y.Z
 ```
 
-等价 npm 脚本：`npm run version:show` / `version:log` / `version:bump` / `version:check`
+等价 npm 脚本：`npm run version:show` / `version:log` / `version:bump` / `version:check` / `version:tag`
+
+**发一版的固定节奏**（四步，别调换）：
+
+```bash
+node scripts/version.js bump minor "这次加了什么"   # 1. 升版本 + 写日志
+git add -A && git commit -m "chore(release): v0.3.0"  # 2. 提交
+node scripts/version.js tag                          # 3. 打 tag（必须在提交后）
+git push --follow-tags                               # 4. 推提交 + tag
+```
+
+> 第 3 步**必须在提交之后** —— 工作区不干净时 `tag` 会直接报错拦下，避免 tag 打在旧提交上。
+> `git push` 单独用不会带 tag，要用 `--follow-tags`。
 
 **先启用钩子**（一次即可）：
 
@@ -161,6 +175,7 @@ npm run hooks:install             # → git config core.hooksPath scripts/hooks
 - `CHANGELOG.md` 最新条目是否 == `VERSION`
 - `package.json` 版本镜像是否一致
 - **自上个版本以来是否存在「没被记录的变更」** —— 用 git 基线机械判定，改了多少文件就管多少个
+- 该版本的 tag `vX.Y.Z` 是否已打、是否指向正确的提交（提示项，不阻断）
 
 确知不需升版本时（应写明理由）：`GBE_SKIP_VERSION_CHECK=1 git push`
 

@@ -27,6 +27,12 @@
  *       把镜像（顶层 package.json 的 version）对齐到 VERSION。
  *       **不动版本号、不写日志** —— 只修镜像漂移。
  *
+ *   node scripts/version.js tag [--message "说明"] [--dry-run]
+ *       在当前 HEAD 打附注 tag `v<VERSION>`，说明默认取自 CHANGELOG 该版本正文。
+ *       **必须在提交之后跑**（工作区不干净会直接报错），否则 tag 会打在旧提交上。
+ *
+ * 推荐节奏：bump → git commit → tag → git push --follow-tags
+ *
  * 注意：本文件与 `gbe-studio/scripts/version.js` **逐字节相同**。
  *       改动必须双仓同步提交（AGENTS.md §2.6 同提交同步项）。
  */
@@ -159,6 +165,20 @@ function listReleases(text) {
   return out;
 }
 
+/** 取 CHANGELOG 中某版本的正文（去掉标题行），用于生成 tag 说明 */
+function releaseBody(text, version) {
+  const releases = listReleases(text);
+  const i = releases.findIndex((r) => r.version === version);
+  if (i === -1) return '';
+  const start = releases[i].index;
+  const nextRel = text.slice(start + 1).search(/\n## \[/);
+  const end = nextRel === -1 ? text.length : start + 1 + nextRel;
+  return text
+    .slice(start, end)
+    .replace(/^##\s*\[[^\]]+\][^\n]*\n?/, '')
+    .trim();
+}
+
 // ─────────────────────────── show ───────────────────────────
 
 function cmdShow() {
@@ -249,7 +269,8 @@ function cmdBump(argv) {
   console.log('');
   console.log(`${C.dim}下一步：${C.r}`);
   console.log(`  git add -A && git commit -m "chore(release): v${next}"`);
-  console.log(`  git push`);
+  console.log('  node scripts/version.js tag        # 提交后打附注 tag');
+  console.log('  git push --follow-tags');
   return 0;
 }
 
@@ -318,6 +339,22 @@ function cmdCheck(argv) {
         );
       }
     }
+    // 4b) tag 锚点：VERSION 对应的 tag 是否已打、是否打对位置
+    if (version) {
+      const tagName = `v${version}`;
+      if (!(git(['tag', '-l', tagName]) || '').trim()) {
+        warnings.push(`还没打 tag ${tagName} —— 提交后跑：node scripts/version.js tag`);
+      } else {
+        const tagCommit = (git(['rev-list', '-n', '1', tagName]) || '').trim();
+        const verCommit = (git(['log', '-1', '--format=%H', '--', 'VERSION']) || '').trim();
+        if (tagCommit && verCommit && tagCommit !== verCommit) {
+          warnings.push(
+            `tag ${tagName} 指向 ${tagCommit.slice(0, 7)}，而 VERSION 最后改动在 ${verCommit.slice(0, 7)} —— 确认是否打错位置`
+          );
+        }
+      }
+    }
+
     const dirty = (git(['status', '--porcelain']) || '').trim();
     if (dirty) warnings.push('工作区有未提交的改动（推送只会带上已提交的内容）');
   }
@@ -357,6 +394,66 @@ function cmdSync() {
   return 0;
 }
 
+// ─────────────────────────── tag ───────────────────────────
+
+function cmdTag(argv) {
+  const dryRun = argv.includes('--dry-run');
+  const mi = argv.indexOf('--message');
+  const customMsg = mi !== -1 ? argv[mi + 1] : null;
+
+  const version = readVersion();
+  const tagName = `v${version}`;
+
+  if (!isGitRepo()) die('当前目录不是 git 仓库，无法打 tag');
+
+  if ((git(['tag', '-l', tagName]) || '').trim()) {
+    die(
+      `tag ${tagName} 已存在。**已发布的 tag 不要移动** —— 同一版本号指向不同代码，比多打一个 tag 危险。\n` +
+        `    确实要重打（仅在尚未推送时）：git tag -f -a ${tagName} -m "..." && git push -f origin ${tagName}`
+    );
+  }
+
+  const dirty = (git(['status', '--porcelain']) || '').trim();
+  if (dirty) {
+    const shown = dirty.split('\n').slice(0, 15).map((l) => `      ${l}`).join('\n');
+    die(
+      `工作区不干净，tag 会打错位置 —— **先提交再打**：\n${shown}\n` +
+        `    → git add -A && git commit -m "chore(release): ${tagName}" && node scripts/version.js tag`
+    );
+  }
+
+  const head = (git(['rev-parse', '--short', 'HEAD']) || '').trim();
+  const body = customMsg || releaseBody(readChangelog(), version) || tagName;
+
+  if (dryRun) {
+    console.log(`${C.dim}── dry-run ──${C.r}`);
+    console.log(`将在 ${head} 打附注 tag ${C.b}${tagName}${C.r}`);
+    console.log('');
+    console.log(`${C.dim}说明（取自 CHANGELOG [${version}]）：${C.r}`);
+    console.log(body.split('\n').map((l) => `  ${l}`).join('\n'));
+    return 0;
+  }
+
+  if (git(['tag', '-a', tagName, '-m', body]) === null) {
+    die(`打 tag 失败：git tag -a ${tagName}`);
+  }
+
+  ok(`已打附注 tag ${C.b}${tagName}${C.r} → ${head}`);
+  console.log('');
+  console.log(`${C.dim}说明（取自 CHANGELOG）：${C.r}`);
+  console.log(
+    body
+      .split('\n')
+      .slice(0, 6)
+      .map((l) => `  ${l}`)
+      .join('\n')
+  );
+  console.log('');
+  console.log(`${C.dim}下一步：${C.r}`);
+  console.log('  git push --follow-tags');
+  return 0;
+}
+
 // ─────────────────────────── main ───────────────────────────
 
 function main() {
@@ -372,6 +469,8 @@ function main() {
       return cmdCheck(argv);
     case 'sync':
       return cmdSync();
+    case 'tag':
+      return cmdTag(argv);
     case undefined:
     case '-h':
     case '--help':
@@ -383,11 +482,15 @@ function main() {
   node scripts/version.js bump <major|minor|patch> [摘要...] [--dry-run] [--date YYYY-MM-DD]
   node scripts/version.js check [--quiet]
   node scripts/version.js sync
+  node scripts/version.js tag [--message "说明"] [--dry-run]
+
+推荐节奏：
+  bump → git commit → tag → git push --follow-tags
 
 版本真源：VERSION   变更真源：CHANGELOG.md   镜像：package.json（若存在）`);
       return 0;
     default:
-      die(`未知子命令：${cmd}（可用：show / log / bump / check / sync）`);
+      die(`未知子命令：${cmd}（可用：show / log / bump / check / sync / tag）`);
   }
 }
 

@@ -45,13 +45,25 @@
 6. **破坏性操作先列清单再确认**
    删文件 / 覆盖工程 / 批量导入 → 先输出受影响清单。投递目录一律 **move 归档**，**禁止 `rm -rf`**。
 
-7. **推送即发布：版本号与更新日志必须跟上**
+7. **推送即发布：版本号、更新日志、tag 三者必须跟上**
    每次 `git push` 前先跑 —— `node scripts/version.js bump <major|minor|patch> "这次改了什么"`，
    让 `VERSION`、`CHANGELOG.md`、`package.json` 一起进这次提交。
    **禁止**在没有新版本条目的情况下推送（`scripts/hooks/pre-push` 会拦下）。
    段位怎么取见 `CHANGELOG.md` 顶部表；确知不需升版本时用
    `GBE_SKIP_VERSION_CHECK=1 git push`，并在提交信息里写明理由。
    `scripts/version.js` 与 `gbe-assets` 侧**逐字节相同** —— 改动必须双仓同步提交。
+
+   **发一版的固定四步**（顺序不能换）：
+
+   ```bash
+   node scripts/version.js bump minor "摘要"     # 1. 升版本 + 写日志 + 同步镜像
+   git add -A && git commit -m "chore(release): vX.Y.Z"   # 2. 提交
+   node scripts/version.js tag                   # 3. 打附注 tag（必须在提交后）
+   git push --follow-tags                        # 4. 推提交与 tag
+   ```
+
+   `tag` 子命令会在工作区不干净时直接报错 —— 那是**保护**，别绕过。
+   已推送的 tag **绝不移动**（同一版本号指向不同代码，比多打一个 tag 危险得多）。
 
 ---
 
@@ -72,6 +84,7 @@
 
 - [ ] `node scripts/version.js check` 通过（版本号 / 更新日志 / 镜像一致，**无未记录变更**）
 - [ ] 本次改动已写进 `CHANGELOG.md` 的新条目，且摘要是人话（不是"更新代码"）
+- [ ] 该版本已打 tag（`node scripts/version.js tag`），推送用 `git push --follow-tags`
 - [ ] 首次 clone 后跑过 `node scripts/install-hooks.js`（启用 pre-push 校验）
 - [ ] `node core/policy/test/router.smoke.js` 全绿
 - [ ] `node bridges/sync-ports.js --check` 通过

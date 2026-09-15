@@ -19,7 +19,14 @@
 
 ## [未发布]
 
-<!-- 每次 bump 时，这段内容会被带进新版本条目；留空则使用命令行的摘要。 -->
+## [0.3.0] - 2026-09-15
+
+### 变更
+- 新增 tag 子命令：在当前 HEAD 打附注 tag vX.Y.Z，说明自动取自 CHANGELOG 该版本正文；工作区不干净时直接报错，防止 tag 打错位置
+- check 新增 tag 锚点检查：该版本的 tag 是否已打、是否指向正确的提交（提示项，不阻断）
+- 补齐历史 tag：v0.1.0（初始骨架）、v0.2.0（版本机制），并推送远端
+- README 与 AGENTS.md 写入发版固定四步：bump → commit → tag → push --follow-tags
+- package.json 新增 version:sync / version:tag 快捷脚本
 
 ## [0.2.0] - 2026-09-15
 

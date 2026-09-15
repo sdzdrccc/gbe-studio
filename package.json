@@ -1,6 +1,6 @@
 {
   "name": "gbe-studio",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "GBE-Studio —— 生产端：多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地",
   "license": "MIT",
@@ -13,6 +13,8 @@
     "version:log": "node scripts/version.js log",
     "version:bump": "node scripts/version.js bump",
     "version:check": "node scripts/version.js check",
+    "version:sync": "node scripts/version.js sync",
+    "version:tag": "node scripts/version.js tag",
     "hooks:install": "node scripts/install-hooks.js",
     "ports:sync": "node bridges/sync-ports.js",
     "ports:check": "node bridges/sync-ports.js --check",
