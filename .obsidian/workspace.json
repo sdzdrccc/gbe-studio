@@ -190,6 +190,8 @@
   },
   "active": "07ffbb8b073ca0a0",
   "lastOpenFiles": [
+    "build/out/procedural-catalog.html",
+    "build/procedural/catalog.js",
     "build/procedural/assemble.js",
     "build/procedural/verify.js",
     "build/out/procedural-report.json",
@@ -201,8 +203,6 @@
     "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/source.json",
     "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/lod0.glb",
-    "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/asset.json",
-    "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0",
     "build/out/preview-test/cn-ancient.roof.gable-board-a@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.roof.ridge-tile-cylinder@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.roof.purlin-round-a@1.0.0/preview.png",

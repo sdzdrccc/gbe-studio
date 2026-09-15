@@ -94,7 +94,8 @@ gbe-studio/
 │   │   ├── components.js        ★ 18 件程序化构件定义（BUILDING-DECOMPOSITION §9.2 标 P 的全部）
 │   │   ├── generate.js          生成器：几何 → 逐件自检 → 打包含盘 → 投递 inbox（--check / --only / --ss）
 │   │   ├── assemble.js          装配清单生成：按「谁插谁」求解坐标（不硬编码）→ §19.5 首跑 → 落 `assemblies/`
-│   │   └── verify.js            出包复验（调 gbe-assets 的 @gbe/schema 真源校验器，门禁双跑的第二次）
+│   │   ├── verify.js            出包复验（调 gbe-assets 的 @gbe/schema 真源校验器，门禁双跑的第二次）
+│   │   └── catalog.js           构件总览单页（自包含 HTML，预览图内嵌）—— 从已入库实体重建，派生物
 │   └── templates/               参数化建筑模板
 │       └── tpl-hall-xieshan-double.json   歇山双檐殿堂（主殿 7 开间 / 配殿 5 开间 = 同模板两组参数）
 │
