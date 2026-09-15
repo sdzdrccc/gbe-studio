@@ -2,7 +2,7 @@
 
 **GBE = Generative Blender-to-Engine**
 
-[![version](https://img.shields.io/badge/version-0.2.0-blue)](CHANGELOG.md) ![license](https://img.shields.io/badge/license-MIT-green) ![engine](https://img.shields.io/badge/engines-Godot%20%7C%20Unreal-informational)
+[![version](https://img.shields.io/github/v/tag/sdzdrccc/gbe-studio?label=version&color=blue)](CHANGELOG.md) ![license](https://img.shields.io/badge/license-MIT-green) ![engine](https://img.shields.io/badge/engines-Godot%20%7C%20Unreal-informational)
 
 > 生产端：把「多平台 AI 生成 → **构件拆分** → Blender 精修 → 多引擎落地」做成一条可复用、可复现、可控成本的资产流水线。
 

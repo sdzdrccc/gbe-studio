@@ -1,6 +1,6 @@
 {
   "name": "gbe-studio",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "GBE-Studio —— 生产端：多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地",
   "license": "MIT",
