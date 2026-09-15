@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# GBE pre-push 钩子 —— 推送前强制校验版本号与更新日志
+# =====================================================
+# 由 `node scripts/install-hooks.js` 通过 `git config core.hooksPath scripts/hooks` 启用。
+# 纪律见 AGENTS.md §2.6：每次推送都要带版本号与新日志条目。
+#
+# 逃生舱（仅限确知不需升版本的场合，且应在 PR 说明里写清原因）：
+#   GBE_SKIP_VERSION_CHECK=1 git push
+
+if [ "${GBE_SKIP_VERSION_CHECK}" = "1" ]; then
+  echo "[pre-push] GBE_SKIP_VERSION_CHECK=1 —— 跳过版本校验"
+  exit 0
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "[pre-push] 警告：PATH 里没有 node，跳过版本校验。" >&2
+  echo "           请手动跑一次：node scripts/version.js check" >&2
+  exit 0
+fi
+
+node scripts/version.js check || {
+  echo "" >&2
+  echo "[pre-push] 推送被拦下：版本号或更新日志没跟上。" >&2
+  echo "           补一条即可：" >&2
+  echo "             node scripts/version.js bump patch \"这次改了什么\"" >&2
+  echo "" >&2
+  exit 1
+}

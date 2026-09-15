@@ -16,11 +16,12 @@
 | 拆构件 | `docs/BUILDING-DECOMPOSITION.md` + `decompose/rules/socket-inference.json` |
 | 写精修配方 | `core/contracts/refine-recipe.schema.json` |
 | 改端口 | `../gbe-assets/catalog/ports.json`（**真源不在本仓**），然后跑 `bridges/sync-ports.js` |
+| 改版本号 / 写更新日志 | `VERSION` + `CHANGELOG.md`，走 `node scripts/version.js`（**别手改** `package.json.version`） |
 | 不确定"为什么这么定" | `../gbe-assets/docs/DECISIONS.md` |
 
 ---
 
-## 2. 六条不可违反的纪律
+## 2. 七条不可违反的纪律
 
 1. **平台 / 引擎 / MCP 实现的名字与参数一律读注册表**
    **禁止**在流程代码里出现 `if (provider === 'tripo')` 这类分支。
@@ -44,6 +45,14 @@
 6. **破坏性操作先列清单再确认**
    删文件 / 覆盖工程 / 批量导入 → 先输出受影响清单。投递目录一律 **move 归档**，**禁止 `rm -rf`**。
 
+7. **推送即发布：版本号与更新日志必须跟上**
+   每次 `git push` 前先跑 —— `node scripts/version.js bump <major|minor|patch> "这次改了什么"`，
+   让 `VERSION`、`CHANGELOG.md`、`package.json` 一起进这次提交。
+   **禁止**在没有新版本条目的情况下推送（`scripts/hooks/pre-push` 会拦下）。
+   段位怎么取见 `CHANGELOG.md` 顶部表；确知不需升版本时用
+   `GBE_SKIP_VERSION_CHECK=1 git push`，并在提交信息里写明理由。
+   `scripts/version.js` 与 `gbe-assets` 侧**逐字节相同** —— 改动必须双仓同步提交。
+
 ---
 
 ## 3. 拆分层专属纪律（ADR-0006）
@@ -61,6 +70,9 @@
 
 ## 4. 自检清单（提交前）
 
+- [ ] `node scripts/version.js check` 通过（版本号 / 更新日志 / 镜像一致，**无未记录变更**）
+- [ ] 本次改动已写进 `CHANGELOG.md` 的新条目，且摘要是人话（不是"更新代码"）
+- [ ] 首次 clone 后跑过 `node scripts/install-hooks.js`（启用 pre-push 校验）
 - [ ] `node core/policy/test/router.smoke.js` 全绿
 - [ ] `node bridges/sync-ports.js --check` 通过
 - [ ] 新增平台/引擎/实现 → 注册表里有记录，且 `capabilities.json` 如实声明（不谎报 quad / 白模等能力）
