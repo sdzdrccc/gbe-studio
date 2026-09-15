@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/refine-recipe.json",
+  "title": "RefineRecipe",
+  "description": "声明式精修配方（PLAN §4.4）。同配方同输入 → 同结果，可回归。recipe_hash 覆盖 recipe_id + blender_major + steps + qa（CONVENTIONS §7.1）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["recipe_id", "steps", "qa"],
+  "properties": {
+    "recipe_id": { "type": "string", "minLength": 1 },
+    "applies_to": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "适用范围，便于路由到配方。",
+      "properties": {
+        "kit": { "type": "string" },
+        "category": { "type": "string" },
+        "granularity": { "enum": ["L1", "L2", "L3"] }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["op"],
+        "properties": {
+          "op": {
+            "enum": [
+              "cleanup",
+              "retopo",
+              "normalize",
+              "solidify",
+              "decimate",
+              "material_slots",
+              "sockets_apply",
+              "weld_boundary",
+              "export"
+            ]
+          },
+          "params": { "type": "object", "additionalProperties": true },
+          "when": {
+            "type": "string",
+            "description": "条件表达式，如 open_shell / topology_wanted == 'quad'。为空则无条件执行。"
+          }
+        }
+      }
+    },
+    "qa": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "pivot",
+          "unit",
+          "axis",
+          "budget",
+          "uv_exists",
+          "material_slots",
+          "grid_alignment",
+          "socket_present",
+          "manifold"
+        ]
+      },
+      "description": "必须纳入 recipe_hash —— 判据变了，『合格』的含义就变了。"
+    },
+    "notes": { "type": "string" }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$comment": "Tripo 能力声明。真源；路由与门禁一律读这里，禁止在代码里写死平台参数。",
+  "id": "tripo",
+  "display_name": "Tripo",
+  "enabled": true,
+  "access": "cli-oauth",
+  "channels": ["default"],
+
+  "modes": ["text", "image", "multiview", "remesh", "rig", "lowpoly"],
+  "topology": ["tri"],
+  "formats": ["glb", "fbx", "obj", "usdz"],
+  "max_concurrency": 3,
+  "billing_unit": "credit",
+
+  "supports": {
+    "pbr": true,
+    "quad": false,
+    "face_limit": true,
+    "seed": true,
+    "negative_prompt": true,
+    "geometry_only": false,
+    "multiview": true
+  },
+
+  "cost": {
+    "credit_by_tier": { "primitive": 0, "component": 30, "mass": 40, "hero": 55 },
+    "usd_est_by_tier": { "component": 0.18, "mass": 0.24, "hero": 0.33 }
+  },
+
+  "limits": {
+    "max_faces": 20000,
+    "min_faces": 48,
+    "note": "P1 低模 48–20k 面；H3.1 可用有限 quad"
+  },
+
+  "reliability": {
+    "region_blocked_from_cn": false,
+    "url_ttl_seconds": 300,
+    "note": "产出 URL 短时效（约 5 分钟）——必须即时落盘"
+  },
+
+  "pitfalls": [
+    "`--for game-pc` 会隐式触发 FBX 转换并多扣积分 —— 显式指定导出格式，不要用该预设。"
+  ],
+
+  "verified_at": "2026-09"
+}

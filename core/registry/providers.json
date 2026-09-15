@@ -1,0 +1,84 @@
+{
+  "$comment": "★ 平台注册表（CONVENTIONS §20.1 为其人类可读镜像）。一切『启用哪家平台』由此决定，禁止写死在代码里（禁令 1）。",
+  "registry_version": "1",
+  "updated_at": "2026-09-15",
+  "providers": [
+    {
+      "id": "tripo",
+      "enabled": true,
+      "display_name": "Tripo",
+      "adapter": "providers/tripo",
+      "capabilities": "providers/tripo/capabilities.json",
+      "access": "cli-oauth",
+      "channels": ["default"],
+      "priority": 10,
+      "tier_preference": ["component", "mass"],
+      "role": "默认主力：速度快、成本低、低模友好",
+      "cost_note": "P1 低模 48–20k 面；约 $0.10–0.25/件"
+    },
+    {
+      "id": "meshy",
+      "enabled": true,
+      "display_name": "Meshy",
+      "adapter": "providers/meshy",
+      "capabilities": "providers/meshy/capabilities.json",
+      "access": "rest",
+      "channels": ["default"],
+      "priority": 20,
+      "tier_preference": ["hero", "mass"],
+      "role": "hero 件 / 角色 / 动画 / 贴图重做；生态最好（600+ 动画库）",
+      "cost_note": "Pro 起；中低量级"
+    },
+    {
+      "id": "hunyuan3d",
+      "enabled": true,
+      "display_name": "腾讯混元 3D",
+      "adapter": "providers/hunyuan3d",
+      "capabilities": "providers/hunyuan3d/capabilities.json",
+      "access": "multi-channel",
+      "channels": ["tokenhub", "tencentcloud", "web"],
+      "default_channel": "tokenhub",
+      "priority": 30,
+      "tier_preference": ["component"],
+      "role": "国内直连兜底 + 白模（geometry-only）构件 —— 拆件阶段首选",
+      "cost_note": "低；web 通道需手工补记成本",
+      "channel_matrix": {
+        "tokenhub": { "auth": "bearer", "capabilities": ["text", "image"], "formats": ["glb", "obj"], "gate": "低（推荐默认）" },
+        "tencentcloud": { "auth": "tc3-signature", "capabilities": ["text", "image", "multiview", "geometry_only"], "formats": ["glb", "obj", "fbx", "stl", "usdz"], "gate": "中（需腾讯云账号）" },
+        "web": { "auth": "browser-session", "mode": "semi-automatic", "capabilities": ["text", "image"], "gate": "最低（官网网页版，人工交互）" }
+      }
+    },
+    {
+      "id": "fal",
+      "enabled": true,
+      "display_name": "fal.ai",
+      "adapter": "providers/fal",
+      "capabilities": "providers/fal/capabilities.json",
+      "access": "rest-single-key",
+      "channels": ["default"],
+      "priority": 40,
+      "tier_preference": ["mass", "component"],
+      "role": "聚合兜底 + 长尾模型（单 key 打多家）",
+      "cost_note": "pay-per-use，约 $0.07–0.48/件"
+    },
+    {
+      "id": "rodin",
+      "enabled": false,
+      "display_name": "Hyper3D Rodin",
+      "adapter": null,
+      "priority": 99,
+      "role": "不接入（ADR-0002）",
+      "disabled_reason": "Business 订阅约 $120/mo 不划算；本项目 hero 件占比低。quad 拓扑需求改走 Blender 重拓扑（retopo 步骤）。",
+      "re_enable_hint": "条目保留：想启用时只需把 enabled 改为 true 并补一个 providers/rodin/ 适配器目录，无需改动上层。"
+    },
+    {
+      "id": "local-open-source",
+      "enabled": false,
+      "display_name": "本地开源（Stability SF3D / TRELLIS）",
+      "adapter": null,
+      "priority": 98,
+      "role": "批量草稿 / 隐私敏感（未排期）",
+      "disabled_reason": "未排期。自托管可离线、近零成本，但仅 albedo、无 PBR。"
+    }
+  ]
+}

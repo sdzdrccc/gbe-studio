@@ -1,0 +1,90 @@
+{
+  "$comment": "★ 只读视图 —— 由 bridges/sync-ports.js 从 gbe-assets/catalog/ports.json 生成。请勿手工编辑（会被覆盖）；改端口请改真源后重跑 sync-ports.js。",
+  "generated_from": "../gbe-assets/catalog/ports.json",
+  "generated_by": "bridges/sync-ports.js",
+  "source_updated_at": "2026-09-15",
+  "ports_version": "1",
+  "authority": "gbe-assets/catalog/ports.json",
+  "summary": {
+    "total": 9,
+    "owned_by_studio": 7,
+    "active": 6,
+    "deferred": 1,
+    "owned_by_assets": 2
+  },
+  "studio_ports": {
+    "godot-mcp": {
+      "port": 9876,
+      "protocol": "tcp",
+      "purpose": "Godot 编辑器桥（godot-mcp 客户端写死，不可改）",
+      "required": true
+    },
+    "blender-mcp": {
+      "port": 9877,
+      "protocol": "tcp",
+      "purpose": "Blender MCP（与 Godot 错开）",
+      "required": true
+    },
+    "unreal-python-remote-exec": {
+      "port": 6776,
+      "protocol": "udp",
+      "purpose": "UE5 Python Remote Execution（sam-david/unreal-mcp 首选实现）",
+      "required": false
+    },
+    "unreal-remote-control": {
+      "port": 30010,
+      "protocol": "http",
+      "purpose": "UE5 Remote Control API",
+      "required": false
+    },
+    "unreal-mcp-alt-chir24": {
+      "port": 8091,
+      "protocol": "ws",
+      "purpose": "UE5 备选 MCP 实现 ChiR24/Unreal_mcp（仅该实现被选为 active 时占用）",
+      "required": false
+    },
+    "unreal-mcp-alt-aadeshrao123": {
+      "port": 55557,
+      "protocol": "tcp",
+      "purpose": "UE5 备选 MCP 实现 aadeshrao123/Unreal-MCP + ue-cli（仅该实现 active 时占用）",
+      "required": false
+    }
+  },
+  "deferred_ports": {
+    "unity-mcp": {
+      "port": 8080,
+      "protocol": "http",
+      "purpose": "Unity MCP —— 预留，当前不占用",
+      "note": "ADR-0004：Unity 延后。端口保留以免将来冲突。"
+    }
+  },
+  "reserved_by_others": {
+    "gbe-assets-api": {
+      "port": 8788,
+      "owner": "gbe-assets",
+      "purpose": "GBE-Assets REST API"
+    },
+    "gbe-assets-web": {
+      "port": 8789,
+      "owner": "gbe-assets",
+      "purpose": "GBE-Assets 浏览下载站"
+    }
+  },
+  "by_engine": {
+    "blender": [
+      9877
+    ],
+    "godot": [
+      9876
+    ],
+    "unreal": [
+      6776,
+      30010,
+      8091,
+      55557
+    ],
+    "unity": [
+      8080
+    ]
+  }
+}

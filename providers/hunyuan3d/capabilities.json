@@ -1,0 +1,86 @@
+{
+  "$comment": "腾讯混元 3D 能力声明 —— 一平台三通道（ADR-0003）。通道差异只体现在本文件与 providers/hunyuan3d/ 内，上层不感知。",
+  "id": "hunyuan3d",
+  "display_name": "腾讯混元 3D",
+  "enabled": true,
+  "access": "multi-channel",
+  "channels": ["tokenhub", "tencentcloud", "web"],
+  "default_channel": "tokenhub",
+  "channel_probe_order": ["tokenhub", "tencentcloud", "web"],
+
+  "channel_matrix": {
+    "tokenhub": {
+      "endpoint": "https://tokenhub.tencentmaas.com/v1/api/3d/submit",
+      "query_endpoint": "https://tokenhub.tencentmaas.com/v1/api/3d/query",
+      "auth": "bearer",
+      "model": "hy-3d-3.1",
+      "modes": ["text", "image"],
+      "formats": ["glb", "obj"],
+      "supports": { "geometry_only": false, "multiview": false, "pbr": true },
+      "gate": "低",
+      "recommended": true,
+      "note": "Bearer API Key，最简。返回 obj/glb 直链。"
+    },
+    "tencentcloud": {
+      "endpoint": "ai3d.tencentcloudapi.com",
+      "actions": ["SubmitHunyuanTo3DProJob", "SubmitHunyuanTo3DRapidJob", "QueryHunyuanTo3DJob"],
+      "alt_endpoint": "mps.tencentcloudapi.com",
+      "alt_actions": ["SubmitHunyuan3DTask"],
+      "auth": "tc3-signature",
+      "modes": ["text", "image", "multiview"],
+      "formats": ["glb", "obj", "fbx", "stl", "usdz", "mp4"],
+      "supports": { "geometry_only": true, "multiview": true, "pbr": true },
+      "gate": "中",
+      "note": "能力最全：Rapid 快 / Pro 精 / geometry-only 白模 / 多视角图生。白模能力对拆件阶段价值最高。"
+    },
+    "web": {
+      "endpoint": "https://3d.hunyuan.tencent.com",
+      "auth": "browser-session",
+      "mode": "semi-automatic",
+      "modes": ["text", "image"],
+      "formats": ["glb", "obj"],
+      "supports": { "geometry_only": false, "multiview": false, "pbr": true },
+      "gate": "最低",
+      "note": "官网网页版。适配器【不提交任务】，只登记 provenance；task_id 允许 null，成本需手工补记。"
+    }
+  },
+
+  "modes": ["text", "image", "multiview"],
+  "topology": ["tri"],
+  "formats": ["glb", "obj", "fbx", "stl", "usdz"],
+  "max_concurrency": 1,
+  "billing_unit": "credit",
+
+  "supports": {
+    "pbr": true,
+    "quad": false,
+    "face_limit": true,
+    "seed": false,
+    "negative_prompt": false,
+    "geometry_only": true,
+    "multiview": true
+  },
+
+  "cost": {
+    "credit_by_tier": { "primitive": 0, "component": 28, "mass": 38, "hero": 50 },
+    "usd_est_by_tier": { "component": 0.15, "mass": 0.22, "hero": 0.3 },
+    "web_channel_manual": true
+  },
+
+  "limits": {
+    "max_faces": 200000,
+    "note": "Rapid 输出较疏、Pro 输出较密；超过该值时路由会剔除本平台。"
+  },
+
+  "reliability": {
+    "region_blocked_from_cn": false,
+    "note": "国内直连，无网络墙 —— 是 fal / Meshy 的可靠性兜底"
+  },
+
+  "role_notes": [
+    "拆件阶段首选 geometry-only 白模（tencentcloud 通道）：拆件只需几何，不需要纹理，更快更便宜。",
+    "web 通道的产出按『无 API 溯源』处理，不额外打 flags（这是通道差异，不是缺陷）。"
+  ],
+
+  "verified_at": "2026-09"
+}

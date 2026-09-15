@@ -1,0 +1,23 @@
+{
+  "name": "gbe-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GBE-Studio —— 生产端：多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node core/policy/test/router.smoke.js",
+    "ports:sync": "node bridges/sync-ports.js",
+    "ports:check": "node bridges/sync-ports.js --check",
+    "ports:probe": "node bridges/sync-ports.js --probe",
+    "route": "node core/policy/router.js route",
+    "engine": "node core/policy/router.js engine"
+  },
+  "gbe": {
+    "schema_package": "file:../gbe-assets/packages/schema",
+    "$comment": "开发期用 file: 引用同级 gbe-assets 的 packages/schema；CI 期用 git submodule 锁 commit。禁止拷贝副本（CONVENTIONS §0.2）。运行时解析见 core/schema-ref.js。"
+  },
+  "dependencies": {}
+}

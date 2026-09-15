@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/generation-job.json",
+  "title": "GenerationJob",
+  "description": "生成请求（PLAN §4.1）。平台无关 —— 换平台、加平台都不影响本契约。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_id", "mode", "tier", "inputs"],
+  "properties": {
+    "job_id": { "type": "string", "pattern": "^gen-\\d{8}-\\d{4}$" },
+    "mode": { "enum": ["text", "image", "multiview", "remesh", "retexture", "rig"] },
+    "intent": { "enum": ["component", "mass", "hero", "texture", "animation"] },
+    "tier": { "enum": ["primitive", "component", "mass", "hero"] },
+    "granularity_target": {
+      "enum": ["L1", "L2", "L3"],
+      "description": "期望的几何粒度（ADR-0006）：决定出模后走哪条拆分路线。L0 不由生成产出。"
+    },
+    "decompose_route": {
+      "enum": ["auto", "A", "B"],
+      "description": "A 构件直生 / B 整栋拆分。auto 时由 granularity_target 与提示词形态决定。"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "prompt": { "type": "string" },
+        "negative_prompt": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "topology": { "enum": ["tri", "quad"] },
+        "face_limit": { "type": "integer", "minimum": 1 },
+        "texture": { "enum": ["none", "standard", "hd"] },
+        "pbr": { "type": "boolean" },
+        "geometry_only": {
+          "type": "boolean",
+          "description": "白模：拆件阶段只需几何。仅 hunyuan3d 的 tencentcloud 通道支持。"
+        },
+        "format": { "enum": ["glb", "fbx", "obj", "usdz"] }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_cost": { "type": "number", "minimum": 0 },
+        "unit": { "enum": ["credit", "usd"] }
+      }
+    },
+    "provider_hint": {
+      "type": "string",
+      "description": "auto 或具体平台 id。id 必须存在于 core/registry/providers.json；不可用时路由会降级并警告。"
+    },
+    "repro": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "seed": { "type": "integer" } }
+    }
+  }
+}

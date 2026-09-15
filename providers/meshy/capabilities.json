@@ -1,0 +1,48 @@
+{
+  "$comment": "Meshy 能力声明。真源。",
+  "id": "meshy",
+  "display_name": "Meshy",
+  "enabled": true,
+  "access": "rest",
+  "channels": ["default"],
+
+  "modes": ["text", "image", "multiview", "retexture", "remesh", "rig"],
+  "topology": ["tri"],
+  "formats": ["glb", "fbx", "obj", "usdz", "blend"],
+  "max_concurrency": 2,
+  "billing_unit": "credit",
+
+  "supports": {
+    "pbr": true,
+    "quad": false,
+    "face_limit": true,
+    "seed": false,
+    "negative_prompt": true,
+    "geometry_only": false,
+    "multiview": true,
+    "animation_library": true,
+    "retexture": true
+  },
+
+  "cost": {
+    "credit_by_tier": { "primitive": 0, "component": 32, "mass": 45, "hero": 60 },
+    "usd_est_by_tier": { "component": 0.2, "mass": 0.28, "hero": 0.38 }
+  },
+
+  "limits": {
+    "max_faces": 300000,
+    "note": "Meshy 6/7；600+ 动画库；生态最好"
+  },
+
+  "reliability": {
+    "region_blocked_from_cn": false,
+    "url_ttl_seconds": 600
+  },
+
+  "role_notes": [
+    "hero 件与需要动画/重贴图的场合首选。",
+    "rodin 不接入后（ADR-0002），hero 件由 Meshy 承担（拓扑质量靠 Blender 重拓扑补齐）。"
+  ],
+
+  "verified_at": "2026-09"
+}

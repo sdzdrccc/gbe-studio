@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/decomposition-plan.json",
+  "title": "DecompositionPlan",
+  "description": "拆分计划（ADR-0006 / PLAN §4.3）。使拆分可复现：同一 raw 模型 + 同一计划 → 同一组构件。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_id", "source", "route", "target_granularity", "parts"],
+  "properties": {
+    "plan_id": { "type": "string", "pattern": "^dec-\\d{8}-\\d{4}$" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact"],
+      "properties": {
+        "job_id": { "type": "string" },
+        "artifact": { "type": "string", "description": "raw 模型路径（Studio 侧）" }
+      }
+    },
+    "route": { "enum": ["A", "B"], "description": "A 构件直生 / B 整栋拆分" },
+    "target_granularity": { "enum": ["L1", "L2", "L3"] },
+
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["part_id", "kind"],
+        "properties": {
+          "part_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "kind": { "enum": ["L1", "L2", "L3"] },
+          "asset_id": {
+            "type": ["string", "null"],
+            "description": "映射到的资产 id；为 null 表示尚未映射 → 必须进隔离区，禁止静默丢弃。"
+          },
+          "select": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "by": { "enum": ["material_slot", "connected", "bbox", "plane", "manual"] },
+              "value": { "type": "string" }
+            }
+          },
+          "split_ops": {
+            "type": "array",
+            "items": { "enum": ["separate", "bisect", "align_to_grid", "mirror", "cleanup"] }
+          },
+          "sockets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": {
+                  "enum": ["ground-foot", "stack-up", "wall-line", "pillar-point", "roof-seat", "ridge-point", "attach", "continue"]
+                },
+                "position_m": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+                "direction": { "enum": ["+x", "-x", "+y", "-y", "+z", "-z"] },
+                "step_m": { "type": "number", "exclusiveMinimum": 0 },
+                "inferred": { "type": "boolean", "description": "true 表示由规则推断、待人工确认。" }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "snap_m": { "type": "number", "exclusiveMinimum": 0 },
+        "source": { "type": "string", "description": "模数来源，应指向 kit.json.grid —— 禁止第二份模数。" }
+      }
+    },
+
+    "reject_policy": { "enum": ["fail", "quarantine"] },
+    "reject_report": {
+      "type": "array",
+      "description": "拆不出来 / 归不齐 / 映射不上的部分（进隔离区，禁止静默丢弃）。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason": { "type": "string" },
+          "bbox": { "type": "array", "items": { "type": "number" } },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

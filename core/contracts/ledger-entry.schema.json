@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/ledger-entry.json",
+  "title": "LedgerEntry",
+  "description": "成本账本条目（CONVENTIONS §12）。字段集与 assets 侧共用，禁止改名。发生降级时 provider_used ≠ provider_requested。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["provider_requested", "provider_used", "cost", "unit"],
+  "properties": {
+    "provider_requested": {
+      "type": "string",
+      "description": "请求时指定的平台，可能是 auto。"
+    },
+    "provider_used": {
+      "type": "string",
+      "description": "★ 实际出件的平台。降级后可能与 requested 不同 —— 出包与对账都看这个。"
+    },
+    "provider_channel": {
+      "type": ["string", "null"],
+      "description": "多通道平台的实际通道（ADR-0003）。单通道为 null。"
+    },
+    "job_id": { "type": "string" },
+    "asset_id": { "type": "string" },
+    "tier": { "enum": ["primitive", "component", "mass", "hero"] },
+    "granularity": { "enum": ["L0", "L1", "L2", "L3"] },
+
+    "cost": { "type": "number", "minimum": 0 },
+    "unit": { "enum": ["credit", "usd", "cny", "unknown"] },
+    "usd_est": { "type": "number", "minimum": 0 },
+
+    "balance_after": { "type": ["number", "null"] },
+    "balance_source": {
+      "enum": ["primary", "sub-account", "cli-oauth", "unknown"],
+      "description": "余额来源：主账号 / 子账号 / CLI OAuth。"
+    },
+
+    "downgraded": {
+      "type": "boolean",
+      "description": "true 表示本次发生了降级（provider_used ≠ provider_requested）。"
+    },
+    "downgrade_reason": { "type": ["string", "null"] },
+    "manual_entry": {
+      "type": "boolean",
+      "description": "true 表示成本为人工补记（hunyuan3d 的 web 通道不返回计费信息）。"
+    },
+    "at": { "type": "string", "format": "date-time" }
+  }
+}

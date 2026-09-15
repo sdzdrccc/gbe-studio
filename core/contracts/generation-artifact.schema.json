@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/generation-artifact.json",
+  "title": "GenerationArtifact",
+  "description": "平台无关的生成产出（PLAN §4.2）。上层（拆分 / 精修 / 集成）只认本契约，不感知平台与通道差异。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_id", "provider", "files", "stats"],
+  "properties": {
+    "job_id": { "type": "string" },
+    "provider": { "enum": ["tripo", "meshy", "hunyuan3d", "fal", "procedural", "manual"] },
+    "channel": {
+      "type": ["string", "null"],
+      "description": "多通道平台的实际通道（ADR-0003）。单通道平台为 null 或 default。"
+    },
+    "model": { "type": "string" },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "path"],
+        "properties": {
+          "role": { "enum": ["model", "texture", "rig", "animation", "aux"] },
+          "path": { "type": "string" },
+          "format": { "type": "string" }
+        }
+      }
+    },
+    "preview": { "type": ["string", "null"] },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "polycount": { "type": "integer", "minimum": 0 },
+        "vertices": { "type": "integer", "minimum": 0 },
+        "dimensions_m": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } }
+      }
+    },
+    "billing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cost": { "type": "number", "minimum": 0 },
+        "unit": { "enum": ["credit", "usd", "unknown"] },
+        "est_usd": { "type": "number", "minimum": 0 },
+        "manual_entry": {
+          "type": "boolean",
+          "description": "true 表示成本为人工补记（web 通道不返回计费信息）。"
+        }
+      }
+    },
+    "raw_meta": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "平台原始响应，保留以便溯源与排障。必须已脱敏（无 token / 账号）。"
+    }
+  }
+}

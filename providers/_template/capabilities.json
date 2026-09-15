@@ -1,0 +1,49 @@
+{
+  "$comment": "★ 新平台接入模板。新增平台 = 复制本目录为 providers/<id>/，填 capabilities.json + adapter.js，然后在 core/registry/providers.json 加一条记录。上层代码不需要改。",
+  "id": "<provider-id>",
+  "display_name": "<Display Name>",
+  "enabled": false,
+  "access": "rest | cli-oauth | multi-channel",
+  "channels": ["default"],
+
+  "modes": ["text", "image"],
+  "topology": ["tri"],
+  "formats": ["glb"],
+  "max_concurrency": 1,
+  "billing_unit": "credit",
+
+  "supports": {
+    "$comment": "路由按这些布尔值过滤（core/policy/router.js 第 2 步）。必须如实声明 —— 谎报会导致拿到跑不通的任务。",
+    "pbr": true,
+    "quad": false,
+    "face_limit": true,
+    "seed": false,
+    "negative_prompt": false,
+    "geometry_only": false,
+    "multiview": false
+  },
+
+  "cost": {
+    "$comment": "路由的成本闸门与降级决策读这里。primitive 恒为 0（程序化不进 AI 队列）。",
+    "credit_by_tier": { "primitive": 0, "component": 30, "mass": 40, "hero": 55 },
+    "usd_est_by_tier": { "component": 0.2, "mass": 0.25, "hero": 0.35 }
+  },
+
+  "limits": {
+    "$comment": "面数上限参与路由过滤；不写会导致本平台在需要大面数时被错误选中。",
+    "max_faces": 100000,
+    "min_faces": 1
+  },
+
+  "reliability": {
+    "region_blocked_from_cn": false,
+    "url_ttl_seconds": 300,
+    "note": "产出 URL 的存活时间 —— 超短（如 300s）意味着必须即时落盘，不能延迟下载。"
+  },
+
+  "pitfalls": [
+    "把踩过的坑写在这里（如『某参数会隐式触发额外计费』）—— 这是本文件最有价值的部分。"
+  ],
+
+  "verified_at": null
+}

@@ -1,0 +1,56 @@
+{
+  "$comment": "语义映射（ADR-0005）。active 实现由 core/registry/mcp.json 决定；换实现时复制本文件为 <impl-id>.semantic_map.json 另填一份。status=unmapped 表示尚未据实填写 —— 禁止猜测工具名。",
+  "engine": "unreal",
+  "implementation": "sam-david-unreal-mcp",
+  "tool_count_declared": 127,
+  "transport": "udp+http",
+  "ports": [6776, 30010],
+  "status": "unmapped",
+  "verified_at": null,
+  "prerequisites": [
+    "在 UE 中启用内置 Python Editor Script 插件",
+    "在 UE 中启用 Remote Control 插件（HTTP 30010）",
+    "无需编译任何 C++ 插件"
+  ],
+  "how_to_fill": [
+    "1. 启动 UE 编辑器并打开目标工程，确认 6776 / 30010 监听",
+    "2. 列出该 MCP 暴露的工具清单（127 个，分布在 4 个传输层）",
+    "3. 逐条对应填入，跑 `node engines/base.js validate unreal`",
+    "4. 把 status 改为 mapped"
+  ],
+  "actions": {
+    "probe": {
+      "tool": null,
+      "note": "探测 Python Remote Execution 是否连通、编辑器是否就绪。"
+    },
+    "importAsset": {
+      "tool": null,
+      "note": "导入 Content Browser 生成 uasset。注意 UE 用 cm，scale=100 在 placement 里给。"
+    },
+    "instantiate": {
+      "tool": null,
+      "note": "Actor + StaticMeshComponent，放到指定 Level。"
+    },
+    "applyCollision": {
+      "tool": null,
+      "note": "Simple Collision（或按 asset.collision=convex 用显式凸包）。"
+    },
+    "remapMaterials": {
+      "tool": null,
+      "note": "映射到 Material Instance（/Game/Mat/M_*）。"
+    },
+    "registerScene": {
+      "tool": null,
+      "note": "登记 Level / World 资产。"
+    },
+    "verify": {
+      "tool": null,
+      "note": "PIE 运行并截图。验收必做 —— up 轴二次转换会导致模型『躺着』，只有截图能发现。"
+    },
+    "undo": {
+      "tool": null,
+      "note": "事务回退。"
+    }
+  },
+  "axis_note": "轴转换责任：本适配器只做 ① 单位缩放 ×100 ② 水平朝向 ③ 材质重映射。up 轴 Y→Z 由 UE 自己的导入器负责，**不得重复转**。"
+}

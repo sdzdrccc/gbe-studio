@@ -1,0 +1,54 @@
+{
+  "$comment": "fal.ai 能力声明（聚合平台）。单 key 打多家模型，是长尾模型与兜底的通道。",
+  "id": "fal",
+  "display_name": "fal.ai",
+  "enabled": true,
+  "access": "rest-single-key",
+  "channels": ["default"],
+
+  "modes": ["text", "image", "multiview", "remesh", "retexture"],
+  "topology": ["tri"],
+  "formats": ["glb", "fbx", "obj", "usdz"],
+  "max_concurrency": 4,
+  "billing_unit": "usd",
+
+  "supports": {
+    "pbr": true,
+    "quad": false,
+    "face_limit": true,
+    "seed": true,
+    "negative_prompt": true,
+    "geometry_only": false,
+    "multiview": true
+  },
+
+  "aggregated_models": [
+    { "vendor": "tripo", "models": ["h3.1", "p1"] },
+    { "vendor": "meshy", "models": ["v6", "v7"] },
+    { "vendor": "tencent", "models": ["hunyuan-3d-v3.1"] },
+    { "vendor": "other", "models": ["trellis-2", "hitem3d", "triposr"] }
+  ],
+
+  "cost": {
+    "credit_by_tier": { "primitive": 0, "component": 25, "mass": 34, "hero": 48 },
+    "usd_est_by_tier": { "component": 0.07, "mass": 0.2, "hero": 0.48 },
+    "pricing_model": "pay-per-use"
+  },
+
+  "limits": {
+    "max_faces": 300000,
+    "note": "上限取决于所转调的底层模型（hitem3d / trellis-2 等输出较密）。"
+  },
+
+  "reliability": {
+    "region_blocked_from_cn": false,
+    "note": "单一 API Key 覆盖多家；但聚合层会削平部分原生平台的高级参数（如 quad 导出）"
+  },
+
+  "role_notes": [
+    "长尾模型与跨平台比价的兜底通道。",
+    "当某家原生平台临时不可用时，可经 fal 转调同一模型继续跑。"
+  ],
+
+  "verified_at": "2026-09"
+}

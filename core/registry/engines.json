@@ -1,0 +1,64 @@
+{
+  "$comment": "★ 引擎注册表（CONVENTIONS §20.2 为其人类可读镜像）。status: enabled | deferred。deferred 引擎的 derive/import 请求必须【明确报错】，不静默跳过（ADR-0004）。",
+  "registry_version": "1",
+  "updated_at": "2026-09-15",
+  "semantic_actions": [
+    "probe",
+    "importAsset",
+    "instantiate",
+    "applyCollision",
+    "remapMaterials",
+    "registerScene",
+    "verify",
+    "undo"
+  ],
+  "engines": [
+    {
+      "id": "blender",
+      "display_name": "Blender",
+      "status": "enabled",
+      "order": 5,
+      "adapter": null,
+      "role": "精修主通道（不是落地引擎）",
+      "ports": ["blender-mcp"],
+      "requires": ["Blender addon 已启用"]
+    },
+    {
+      "id": "godot",
+      "display_name": "Godot 4.x",
+      "status": "enabled",
+      "order": 10,
+      "adapter": "engines/godot",
+      "semantic_map": "engines/godot/semantic_map.json",
+      "ports": ["godot-mcp"],
+      "requires": ["编辑器插件", "项目已打开"],
+      "axis": { "unit_scale": 1, "horizontal_rotation_deg": 0, "up_axis_handled_by": "engine-importer" }
+    },
+    {
+      "id": "unreal",
+      "display_name": "Unreal Engine 5",
+      "status": "enabled",
+      "order": 20,
+      "adapter": "engines/unreal",
+      "semantic_map": "engines/unreal/semantic_map.json",
+      "ports": ["unreal-python-remote-exec", "unreal-remote-control", "unreal-mcp-alt-chir24", "unreal-mcp-alt-aadeshrao123"],
+      "requires": ["内置 Python Editor Script 插件", "Remote Control 插件"],
+      "axis": { "unit_scale": 100, "horizontal_rotation_deg": 0, "up_axis_handled_by": "engine-importer" },
+      "note": "轴转换只做 ① 单位缩放 ×100 ② 水平朝向 ③ 材质重映射；up 轴 Y→Z 由 UE 导入器负责，集成层不得重复转。"
+    },
+    {
+      "id": "unity",
+      "display_name": "Unity",
+      "status": "deferred",
+      "order": 90,
+      "adapter": "engines/unity",
+      "semantic_map": null,
+      "ports": ["unity-mcp"],
+      "requires": [],
+      "axis": { "unit_scale": 1, "horizontal_rotation_deg": 180, "up_axis_handled_by": "engine-importer" },
+      "deferred_reason": "ADR-0004：当前无在用工程，Phase 1/2 不排期。契约字段（asset.json.engines.unity）与端口 8080 已保留。",
+      "behavior_when_requested": "error",
+      "error_message": "引擎未启用：unity（ADR-0004，延后）。契约与端口已保留，需要时补 engines/unity/ 适配器即可。"
+    }
+  ]
+}

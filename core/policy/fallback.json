@@ -1,0 +1,21 @@
+{
+  "$comment": "降级链与降级规则（CONVENTIONS §20.1）。rodin 已移除（ADR-0002）。链条只含 enabled 平台，改动只改这里。",
+  "chain": ["meshy", "fal", "hunyuan3d"],
+  "rules": {
+    "on_region_block": "skip",
+    "on_auth_missing": "skip",
+    "on_balance_low": "stop",
+    "on_task_failed": "next",
+    "on_timeout": "next",
+    "max_attempts": 3
+  },
+  "notify_on_downgrade": true,
+  "ledger": {
+    "$comment": "降级时必须写明 provider_requested ≠ provider_used（CONVENTIONS §12）。",
+    "record_requested_and_used": true,
+    "record_channel": true
+  },
+  "history": [
+    { "date": "2026-09-15", "change": "移除 rodin，链首改为 meshy（ADR-0002）" }
+  ]
+}

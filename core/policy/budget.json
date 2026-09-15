@@ -1,0 +1,19 @@
+{
+  "$comment": "预算闸门（CONVENTIONS §12）。三种闸门：单件预算 / 批次预算 / 平台余额兜底。余额不足【停止】，不静默重试。",
+  "unit": "credit",
+  "per_asset_max": {
+    "primitive": 0,
+    "component": 35,
+    "mass": 45,
+    "hero": 70
+  },
+  "per_batch_max": 300,
+  "balance_floor": 50,
+  "require_confirm_over": 100,
+  "stop_on_floor_breach": true,
+  "notes": [
+    "per_asset_max.primitive = 0 是刻意的：程序化构件不进 AI 队列（拆分层设计）。",
+    "require_confirm_over：单批预估超过该值时，出包前必须人工确认（强制成本预览）。",
+    "余额来源（主账号 / 子账号 / CLI OAuth）记入账本 balance_source 字段。"
+  ]
+}

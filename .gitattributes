@@ -1,0 +1,11 @@
+# 统一换行：仓库内存 LF，检出时按平台处理
+* text=auto eol=lf
+
+# 二进制 —— 不做换行转换，也不做 diff
+*.blend binary
+*.glb   binary
+*.fbx   binary
+*.png   binary
+
+# 生成物 —— 折叠 diff（由 bridges/sync-ports.js 从真源生成）
+bridges/registry.json linguist-generated=true

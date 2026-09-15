@@ -1,0 +1,126 @@
+{
+  "$comment": "建筑模板 = 带参数的装配清单骨架（BUILDING-DECOMPOSITION §8）。万安城主殿（7 开间）与配殿（5 开间）是【同一模板的两个参数组合】，不是两份清单。模板本身不进 kits/（它不是网格资产）；它【生成】的清单投递到 gbe-assets 的 assemblies/。",
+  "template_version": "1",
+  "template_id": "cn-ancient/tpl-hall-xieshan-double",
+  "name": "歇山重檐大殿模板",
+  "kit": "cn-ancient",
+  "granularity": "L0",
+  "category_target": "assemblies/building",
+
+  "params": {
+    "bays": {
+      "type": "int",
+      "label": "开间数",
+      "default": 5,
+      "values": [3, 5, 7, 9],
+      "affects": ["colonnade.count", "roof.ridge_span_m"]
+    },
+    "bay_width_m": {
+      "type": "enum",
+      "label": "明间面阔",
+      "default": 4,
+      "values": [3, 4, 5],
+      "note": "必须为 wall_module_m（2 m）的倍数或半数 —— 由校验强制"
+    },
+    "story_count": {
+      "type": "int",
+      "label": "屋檐层数",
+      "default": 2,
+      "values": [1, 2],
+      "affects": ["roof.upper_eave"]
+    },
+    "bracket_grade": {
+      "type": "enum",
+      "label": "斗拱等级",
+      "default": "wupin",
+      "values": ["qipin", "wupin", "sanpin"],
+      "note": "映射到三种科的尺寸系数；仅影响变换缩放，不换资产"
+    },
+    "railing": {
+      "type": "bool",
+      "label": "是否带栏杆",
+      "default": true
+    }
+  },
+
+  "rules": [
+    {
+      "expand": "base",
+      "as": "podium-01",
+      "asset": "cn-ancient.base.podium-three-step-a",
+      "transform": { "position": [0, 0, 0], "rotation": [0, 0, 0], "scale": 1 },
+      "sockets": { "bottom": "ground::top" }
+    },
+    {
+      "expand": "colonnade",
+      "as": "colonnade-01",
+      "asset": "cn-ancient.pillar.yanzhu-round-a",
+      "count": "params.bays + 1",
+      "spacing": "kit.grid.pillar_spacing_m[0]",
+      "axis": "+x",
+      "origin_y": "kit.grid.story_heights_m[0] + 0.5",
+      "sockets": { "foot": "podium-01::top-center" },
+      "corner_asset": "cn-ancient.pillar.corner-round-a"
+    },
+    {
+      "expand": "bracket-row",
+      "as": "bracket-01",
+      "at": "colonnade-01[*]",
+      "asset": "cn-ancient.bracket.pingshenke-a",
+      "corner_asset": "cn-ancient.bracket.zhuanjiaoke-a",
+      "head_asset": "cn-ancient.bracket.zhutouke-a",
+      "sockets": { "foot": "colonnade-01::top" }
+    },
+    {
+      "expand": "roof",
+      "as": "roof-01",
+      "asset": "cn-ancient.roof.xieshan-lower-eave-a",
+      "transform": { "position": [0, "bracket-01.top_y", 0], "rotation": [0, 0, 0], "scale": 1 },
+      "sockets": { "roof-seat": "bracket-01::top" }
+    },
+    {
+      "expand": "roof",
+      "as": "roof-02",
+      "when": "params.story_count == 2",
+      "asset": "cn-ancient.roof.xieshan-upper-ridge-a",
+      "transform": { "position": [0, "roof-01.ridge_y + 4", 0], "rotation": [0, 0, 0], "scale": 1 },
+      "sockets": { "roof-seat": "roof-01::ridge-line" }
+    },
+    {
+      "expand": "railing",
+      "when": "params.railing",
+      "as": "railing-01",
+      "at": "podium-01.top_edge",
+      "asset": "cn-ancient.railing.balustrade-straight-a",
+      "step": "kit.grid.wall_module_m",
+      "sockets": { "foot": "podium-01::top-center" }
+    },
+    {
+      "expand": "ornament",
+      "when": "true",
+      "as": "chiwen-01",
+      "asset": "cn-ancient.ornament.chiwen-a",
+      "at": "roof-02::ridge-west,roof-02::ridge-east",
+      "sockets": { "mount": "roof-02::ridge-line" }
+    }
+  ],
+
+  "scene_budget": {
+    "$comment": "装配级面数预算（BUILDING-DECOMPOSITION §10.3）。超预算由装配校验报警。",
+    "lod0": 350000,
+    "lod1": 90000,
+    "proxy": 12000
+  },
+
+  "output": {
+    "id_pattern": "{kit}.assembly.{slug}",
+    "example": "cn-ancient.assembly.wanan-hall-main",
+    "validate_before_submit": true
+  },
+
+  "notes": [
+    "规则里出现的所有数值都必须来自 params 或 kit.grid —— 【禁止在模板里写死模数】（禁令 1）。",
+    "expand 的展开结果由 build/ 下的生成器产出 assemblies/<kit>/building/<name>.json。",
+    "模板不改动构件资产；只产生引用 + 变换。"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "$comment": "语义映射（ADR-0005）：把 8 个稳定语义动作映射到【某个具体 MCP 实现】的工具名。新实现 = 一条注册表记录 + 一份本文件。status=unmapped 表示尚未据实填写（需先跑 gbe-set 列出该 MCP 的实际工具清单，再逐条对应）。禁止猜测工具名。",
+  "engine": "godot",
+  "implementation": "yanhuifair-godot-mcp",
+  "tool_count_declared": 386,
+  "status": "unmapped",
+  "verified_at": null,
+  "how_to_fill": [
+    "1. 装好该 MCP 并在 Godot 里打开目标工程",
+    "2. 在助手中列出该 MCP 暴露的工具清单（386 个）",
+    "3. 按下面的 note 逐条找到对应工具，填入 tool 字段",
+    "4. 跑 `node engines/base.js validate godot` 检查是否 8 条齐全",
+    "5. 把 status 改为 mapped、verified_at 填当天日期"
+  ],
+  "actions": {
+    "probe": {
+      "tool": null,
+      "note": "探测编辑器是否连通、当前工程是否已打开。通常是一个 get_editor_* / get_project_* 类工具。"
+    },
+    "importAsset": {
+      "tool": null,
+      "note": "把模型文件放进 res:// 并触发导入。可能需要两步：写文件 + 触发 scan/import。"
+    },
+    "instantiate": {
+      "tool": null,
+      "note": "实例化到场景：MeshInstance3D，并挂到指定节点下。"
+    },
+    "applyCollision": {
+      "tool": null,
+      "note": "加碰撞：BoxShape3D / ConvexPolygonShape3D / CapsuleShape3D。"
+    },
+    "remapMaterials": {
+      "tool": null,
+      "note": "把资产材质槽映射到工程里的共享 .tres 材质。"
+    },
+    "registerScene": {
+      "tool": null,
+      "note": "把场景/地图登记到地图注册表或场景清单。"
+    },
+    "verify": {
+      "tool": null,
+      "note": "运行并截图；用于验收『模型有没有躺着』。"
+    },
+    "undo": {
+      "tool": null,
+      "note": "回退最近一次操作（Godot 原生撤销栈）。"
+    }
+  }
+}

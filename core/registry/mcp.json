@@ -1,0 +1,108 @@
+{
+  "$comment": "★ MCP 实现注册表（CONVENTIONS §20.3 为其人类可读镜像）—— ADR-0005：MCP 实现【不固定】，「引擎 × 实现」多对多，运行时切换。active=null 表示尚未选择，由 gbe-set 引导。切换命令：gbe-engine mcp use <engine> <impl-id>。",
+  "registry_version": "1",
+  "updated_at": "2026-09-15",
+  "selection_policy": {
+    "$comment": "不预设首选。gbe-set 列出候选、说明 requirements 与 supports 差异，由用户选择。",
+    "preselect": false,
+    "show_capability_diff": true,
+    "verify_ports_on_switch": true
+  },
+  "engines": {
+    "godot": {
+      "active": null,
+      "implementations": [
+        {
+          "id": "yanhuifair-godot-mcp",
+          "display_name": "@yanhuifair/godot-mcp",
+          "repo": "@yanhuifair/godot-mcp",
+          "transport": "tcp",
+          "ports": [9876],
+          "tool_count": 386,
+          "requirements": ["编辑器插件", "项目已打开"],
+          "install": "npm i -g @yanhuifair/godot-mcp",
+          "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify", "undo"],
+          "notes": "端口 9876 写死在客户端，不可改（与 blender 的 9877 错开）",
+          "verified_at": "2026-09"
+        }
+      ]
+    },
+
+    "unreal": {
+      "active": null,
+      "implementations": [
+        {
+          "id": "sam-david-unreal-mcp",
+          "display_name": "sam-david/unreal-mcp",
+          "repo": "https://github.com/sam-david/unreal-mcp",
+          "transport": "udp+http",
+          "ports": [6776, 30010],
+          "tool_count": 127,
+          "requirements": ["启用内置 Python Editor Script 插件", "启用 Remote Control 插件"],
+          "install": "无需编译 C++ 插件 —— 零编译路线",
+          "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify", "undo"],
+          "notes": "4 个传输层；装机门槛最低，与 Godot/Unity 路线一样『装完即用』",
+          "recommend_for": "不想碰 C++ 的机器",
+          "verified_at": "2026-09"
+        },
+        {
+          "id": "chir24-unreal-mcp",
+          "display_name": "ChiR24/Unreal_mcp",
+          "repo": "https://github.com/ChiR24/Unreal_mcp",
+          "transport": "ws",
+          "ports": [8091],
+          "tool_count": 36,
+          "requirements": ["C++ 插件（需编译）"],
+          "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify"],
+          "notes": "200+ 动作；工具入口较少，能力集中在动作层",
+          "recommend_for": "愿意编译插件、要更细的蓝图能力",
+          "verified_at": "2026-09"
+        },
+        {
+          "id": "aadeshrao123-unreal-mcp",
+          "display_name": "aadeshrao123/Unreal-MCP + ue-cli",
+          "repo": "https://github.com/aadeshrao123/Unreal-MCP",
+          "transport": "tcp",
+          "ports": [55557],
+          "tool_count": 230,
+          "requirements": ["C++ 插件（需编译）"],
+          "supports": ["probe", "importAsset", "instantiate", "applyCollision", "remapMaterials", "registerScene", "verify", "undo"],
+          "notes": "命令最多（230+），另有独立 CLI 形态可脱离 AI 助手使用",
+          "recommend_for": "命令行批处理优先 / 需要最多动作覆盖",
+          "verified_at": "2026-09"
+        }
+      ]
+    },
+
+    "blender": {
+      "active": null,
+      "implementations": [
+        {
+          "id": "blender-mcp",
+          "display_name": "blender-mcp",
+          "repo": "blender-mcp",
+          "transport": "tcp",
+          "ports": [9877],
+          "requirements": ["Blender addon 启用"],
+          "install": "Blender 内启用 addon；端口配置为 9877（默认 9876 与 Godot 冲突，故错开）",
+          "supports": ["probe", "undo"],
+          "notes": "精修主通道。用于交互精修（refine.py）与拆分调参；批处理走 headless.py 不依赖它",
+          "extra_actions": ["mesh_edit", "socket_authoring", "decompose_tweak"],
+          "verified_at": "2026-09"
+        }
+      ]
+    },
+
+    "unity": {
+      "active": null,
+      "status": "deferred",
+      "implementations": [],
+      "deferred_reason": "ADR-0004：Unity 延后，注册表中不列实现。",
+      "candidates_for_future": [
+        { "id": "coplaydev-unity-mcp", "repo": "https://github.com/CoplayDev/unity-mcp", "note": "MIT、最活跃；约 47 个工具入口；需要 Unity 2021.3+ 与 Python/uv", "port": 8080 },
+        { "id": "unity-official-mcp", "repo": "Unity AI Assistant 包", "note": "官方路线；需要 Unity 6 + 连接 Unity Cloud + 商业订阅", "port": null },
+        { "id": "bluepuff71-unitymcp", "repo": "https://github.com/Bluepuff71/UnityMCP", "note": "纯 C# 原生，仅需 Package，无需外部运行时；51 工具", "port": 8080 }
+      ]
+    }
+  }
+}

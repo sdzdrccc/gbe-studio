@@ -1,0 +1,47 @@
+# ---- 本机配置（绝不入库，CONVENTIONS §13）----
+gbe.config.json
+config.json
+*.local.json
+
+# ---- 凭证（永不进 Git / 对话 / 日志）----
+credentials.json
+.env
+.env.*
+*secret*
+*token*
+*.pem
+*.key
+
+# ---- 端口视图由真源生成（bridges/sync-ports.js）----
+# 注意：bridges/registry.json 【要入库】—— 它是 CI 校验对象，不是缓存。
+# 但生成时的临时文件不入库：
+
+# ---- 运行期产物 ----
+runs/
+jobs/
+raw/
+tmp/
+temp/
+*.tmp
+*.log
+
+# ---- 生成物 / 中间态 ----
+pipeline/generated-images/
+decompose/quarantine/
+decompose/out/
+build/out/
+*.blend1
+
+# ---- Node ----
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- 编辑器 / 系统 ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp

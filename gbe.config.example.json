@@ -1,0 +1,78 @@
+{
+  "$comment": "本机配置模板。复制为 gbe.config.json（已被 .gitignore 排除）后按本机实际情况修改。",
+  "$schema_hint": "此文件【不含任何凭证】—— 凭证在 ~/.gbe/credentials.json（权限 600），永不入库。",
+
+  "assets_repo": "../gbe-assets",
+
+  "providers": {
+    "tripo": {
+      "enabled": true,
+      "access": "cli-oauth",
+      "note": "走 tripo CLI 的本地 OAuth 凭证，无需在此配置密钥"
+    },
+    "meshy": {
+      "enabled": true,
+      "access": "rest",
+      "credential_ref": "meshy.api_key",
+      "note": "密钥存 ~/.gbe/credentials.json，此处只写引用名"
+    },
+    "hunyuan3d": {
+      "enabled": true,
+      "channel": null,
+      "note": "channel 留 null 时按 tokenhub → tencentcloud → web 自动探测；可显式指定 tokenhub | tencentcloud | web（ADR-0003）",
+      "credential_ref": "hunyuan3d.tokenhub_key"
+    },
+    "fal": {
+      "enabled": true,
+      "access": "rest-single-key",
+      "credential_ref": "fal.api_key"
+    },
+    "rodin": {
+      "enabled": false,
+      "note": "ADR-0002：不接入。想启用时改 core/registry/providers.json 的 enabled 并补适配器目录"
+    }
+  },
+
+  "engines": {
+    "godot": {
+      "enabled": true,
+      "editor_path": null,
+      "project_path": null,
+      "note": "如 F:/zxc/Project/WananCity"
+    },
+    "unreal": {
+      "enabled": true,
+      "editor_path": null,
+      "project_path": null,
+      "note": "需启用内置 Python Editor Script 与 Remote Control 插件"
+    },
+    "unity": {
+      "enabled": false,
+      "note": "ADR-0004：延后"
+    },
+    "blender": {
+      "enabled": true,
+      "executable_path": null,
+      "note": "无头精修用；如 C:/Program Files/Blender Foundation/Blender 4.5/blender.exe"
+    }
+  },
+
+  "mcp": {
+    "$comment": "active 留 null 时由 gbe-set 引导选择；也可在此显式指定，优先级高于 core/registry/mcp.json 的 active。",
+    "godot": { "active": null },
+    "unreal": { "active": null },
+    "blender": { "active": null }
+  },
+
+  "budget": {
+    "per_batch_max": 300,
+    "balance_floor": 50,
+    "require_confirm_over": 100,
+    "note": "覆盖 core/policy/budget.json 的对应字段（本机值优先）"
+  },
+
+  "cost_account": {
+    "balance_source": "cli-oauth",
+    "note": "余额来源：主账号 / 子账号 / CLI OAuth —— 写入账本 balance_source（CONVENTIONS §12）"
+  }
+}

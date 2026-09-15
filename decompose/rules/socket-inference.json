@@ -1,0 +1,115 @@
+{
+  "$comment": "插槽推断规则（BUILDING-DECOMPOSITION §6.3）。拆分路线 B 用这些规则从切分出的团块推断插槽候选，人工确认后写入。规则按 category-leaf 匹配。",
+  "rules_version": "1",
+  "updated_at": "2026-09-15",
+  "grid_source": "kit.json.grid（禁止在此重复声明模数）",
+
+  "rules": [
+    {
+      "category_leaf": "pillar",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "foot", "type": "ground-foot", "direction": "-y", "at": "bbox_bottom_center" },
+        { "name": "top", "type": "stack-up", "direction": "+y", "at": "bbox_top_center" }
+      ],
+      "constraints": ["顶面与底面必须落 snap_m 网格", "柱径取 0.25 m 的整数倍"]
+    },
+    {
+      "category_leaf": "base",
+      "granularity": ["L1", "L2"],
+      "sockets": [
+        { "name": "bottom", "type": "ground-foot", "direction": "-y", "at": "bbox_bottom_center" },
+        { "name": "top-center", "type": "stack-up", "direction": "+y", "at": "bbox_top_center" }
+      ],
+      "constraints": ["若为柱础：高度只能取 {0.5, 1.0}，保证顶面落 0.5 m 网格（BUILDING-DECOMPOSITION §3.3）"]
+    },
+    {
+      "category_leaf": "beam",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "end-west", "type": "wall-line", "direction": "-x", "at": "bbox_face_center:-x" },
+        { "name": "end-east", "type": "wall-line", "direction": "+x", "at": "bbox_face_center:+x" },
+        { "name": "top", "type": "stack-up", "direction": "+y", "at": "bbox_top_center" }
+      ],
+      "constraints": ["长度必须为 pillar_spacing_m 的整数倍", "枋与平板枋可合并为『额枋组』（粒度判据 4）"]
+    },
+    {
+      "category_leaf": "bracket",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "foot", "type": "stack-up", "direction": "-y", "at": "bbox_bottom_center" },
+        { "name": "top", "type": "roof-seat", "direction": "+y", "at": "bbox_top_center" }
+      ],
+      "constraints": [
+        "三种科（柱头科 / 平身科 / 转角科）必须拆成三个独立资产 —— 单件面数不得超 tier 预算的 1/3（粒度判据 5）",
+        "层高取 0.75 或 1.0（落在 0.5 网格上）"
+      ]
+    },
+    {
+      "category_leaf": "wall",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "end-west", "type": "wall-line", "direction": "-x", "at": "bbox_face_center:-x" },
+        { "name": "end-east", "type": "wall-line", "direction": "+x", "at": "bbox_face_center:+x" }
+      ],
+      "constraints": ["长度必须为 wall_module_m（2 m）的整数倍"]
+    },
+    {
+      "category_leaf": "door-window",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "frame", "type": "wall-line", "direction": "-z", "at": "bbox_center" }
+      ],
+      "constraints": ["洞口尺寸落 0.25 m 造型网格"]
+    },
+    {
+      "category_leaf": "roof",
+      "granularity": ["L1"],
+      "sockets": [
+        { "name": "roof-seat", "type": "roof-seat", "direction": "-y", "at": "bbox_bottom_center" },
+        { "name": "ridge-west", "type": "ridge-point", "direction": "-x", "at": "ridge_line:-x" },
+        { "name": "ridge-east", "type": "ridge-point", "direction": "+x", "at": "ridge_line:+x" }
+      ],
+      "constraints": ["重檐须拆为上檐 / 下檐两个 L1（可各自再拆 L2 瓦面与脊件）"]
+    },
+    {
+      "category_leaf": "roof",
+      "granularity": ["L2"],
+      "match": "name_contains: tile-field",
+      "sockets": [
+        { "name": "eave-line", "type": "continue", "direction": "+x", "step_m": 0.4, "at": "eave_start" },
+        { "name": "ridge-line", "type": "ridge-point", "direction": "+y", "at": "ridge_edge" }
+      ],
+      "constraints": ["step_m 由瓦宽决定；瓦面按檐口方向重复阵列"]
+    },
+    {
+      "category_leaf": "railing",
+      "granularity": ["L2"],
+      "sockets": [
+        { "name": "foot", "type": "ground-foot", "direction": "-y", "at": "bbox_bottom_center" },
+        { "name": "continue-line", "type": "continue", "direction": "+x", "step_m": 2, "at": "axis_start" }
+      ],
+      "constraints": ["直段步距 = wall_module_m"]
+    },
+    {
+      "category_leaf": "ornament",
+      "granularity": ["L3"],
+      "sockets": [
+        { "name": "mount", "type": "attach", "at": "bbox_bottom_center" }
+      ],
+      "constraints": ["单向挂接，不参与结构对齐，允许非网格落点（须标 grid_exempt: true）"]
+    }
+  ],
+
+  "qa": {
+    "$comment": "插入槽推断后必须过的检查（CONVENTIONS §19.5）。",
+    "checks": [
+      "插槽位置落 snap_m 网格（attach 除外）",
+      "direction 与对端互为反向",
+      "mate_types 互认",
+      "承重链可追溯到至少一个 ground-foot",
+      "对接后无几何穿插（AABB 抽检 + 采样）"
+    ],
+    "on_failure": "进 quarantine/，生成 reject_report —— 禁止静默丢弃"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gbe.dev/studio/engine-import-plan.json",
+  "title": "EngineImportPlan",
+  "description": "引擎落地计划（PLAN §4.5）。轴转换只做三件事：① 单位缩放 ② 水平朝向 ③ 材质重映射。up 轴由引擎导入器负责，禁止重复转换。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_id", "engine", "target", "asset"],
+  "properties": {
+    "plan_id": { "type": "string", "pattern": "^imp-\\d{8}-\\d{4}$" },
+    "engine": { "type": "string", "description": "必须在 core/registry/engines.json 且 status=enabled。deferred 引擎会明确报错。" },
+    "mcp_impl": {
+      "type": ["string", "null"],
+      "description": "指定 MCP 实现（ADR-0005）。null 时用注册表的 active。"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["project"],
+      "properties": {
+        "project": { "type": "string" },
+        "scene": { "type": "string" },
+        "map": { "type": "string" }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {
+        "id": { "type": "string" },
+        "version": {
+          "type": "string",
+          "description": "★ 必须带版本，否则无法判断导入的是哪一版。"
+        },
+        "recipe_hash": { "type": "string" },
+        "lod": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "assembly": {
+          "type": ["string", "null"],
+          "description": "若本次导入的是一栋装配建筑，记其装配清单 id（assets 侧解析出实例后再逐个导入）。"
+        }
+      }
+    },
+    "placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "position": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+        "rotation": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+        "scale": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "collision": { "enum": ["box", "convex", "none"] },
+    "materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": { "enum": ["keep", "remap"] },
+        "map": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "verify": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "screenshot": { "type": "boolean" },
+        "run": { "type": "boolean" }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "随包装附带的 _gbe.json 内容，使已导入的资产能自证来源版本。",
+      "properties": {
+        "asset_id": { "type": "string" },
+        "asset_version": { "type": "string" },
+        "recipe_hash": { "type": "string" },
+        "source_hash": { "type": "string" }
+      }
+    }
+  }
+}
