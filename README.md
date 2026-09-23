@@ -96,6 +96,9 @@ gbe-studio/
 │   │   ├── assemble.js          装配清单生成：按「谁插谁」求解坐标（不硬编码）→ §19.5 首跑 → 落 `assemblies/`
 │   │   ├── verify.js            出包复验（调 gbe-assets 的 @gbe/schema 真源校验器，门禁双跑的第二次）
 │   │   └── catalog.js           构件总览单页（自包含 HTML，预览图内嵌）—— 从已入库实体重建，派生物
+│   ├── convergence/         ★   形制收敛的纸面分析（BUILDING-DECOMPOSITION §10.5(c)）
+│   │   ├── forms.js             8 类形制的理想构件集（推定模型，随 §9.1 / §9.2 更新）
+│   │   └── report.js            在造构件之前算收敛曲线：库基线实读 kits/，输出逐形制全新型判定
 │   └── templates/               参数化建筑模板
 │       └── tpl-hall-xieshan-double.json   歇山双檐殿堂（主殿 7 开间 / 配殿 5 开间 = 同模板两组参数）
 │
