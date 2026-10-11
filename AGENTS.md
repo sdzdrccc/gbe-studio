@@ -87,6 +87,7 @@
 - [ ] 该版本已打 tag（`node scripts/version.js tag`），推送用 `git push --follow-tags`
 - [ ] 首次 clone 后跑过 `node scripts/install-hooks.js`（启用 pre-push 校验）
 - [ ] `node core/policy/test/router.smoke.js` 全绿
+- [ ] **动过 §9.2 构件表 / `build/convergence/forms.js` / `kits/*/kit.json` 的 `coverage`** → `node build/convergence/reconcile.js` 全绿（三方对账：表 = 代码 = 分母；漂移即非零退出）
 - [ ] `node bridges/sync-ports.js --check` 通过
 - [ ] 新增平台/引擎/实现 → 注册表里有记录，且 `capabilities.json` 如实声明（不谎报 quad / 白模等能力）
 - [ ] 新增语义映射 → `node engines/base.js validate <engine>` 显示 8/8

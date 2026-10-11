@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { forms, THRESHOLDS, EXTRA_NOTE } = require('./forms');
+const { forms, THRESHOLDS, heroExclusiveParts } = require('./forms');
 
 const KITS_COMPONENTS = path.resolve(__dirname, '../../../gbe-assets/kits/cn-ancient/components');
 
@@ -43,14 +43,16 @@ function readLibrary() {
 function analyse(library) {
   const lib = new Set(library);
   const baseSize = lib.size;
+  const baseline = new Set(lib); // 循环会改写 lib，基线另存一份
   const ordered = forms.slice().sort((a, b) => a.batch - b.batch);
+  const heroOnly = new Set(heroExclusiveParts()); // 只被 hero 形制消费 = 路线 B 的产物集
 
   const steps = [];
   for (const form of ordered) {
     const needed = [...new Set(form.parts)];
     const fresh = needed.filter((p) => !lib.has(p));
     const known = needed.length - fresh.length;
-    const extraFresh = fresh.filter((p) => form.extra && form.extra[p]);
+    const bFresh = fresh.filter((p) => heroOnly.has(p)); // 该形制里须走拆分的件
 
     steps.push({
       key: form.key,
@@ -63,31 +65,47 @@ function analyse(library) {
       reused: known,
       fresh: fresh.length,
       freshList: fresh,
-      extraFresh,
+      bFresh,
+      aFresh: fresh.length - bFresh.length,
       libAfter: lib.size + fresh.length,
     });
 
     fresh.forEach((p) => lib.add(p));
   }
 
-  // 判定：量产值取「同一批次内首个非 hero 形制之后的全部形制」为量产组，
-  // hero 形制单列更宽阈值（阈值来源见 forms.js）。
+  // 判定（§10.5(b) 2026-10-11 改写）：
+  //   · 量产形制 —— 卡**件数**：全新型 ≤ THRESHOLDS.production
+  //   · hero 形制 —— **不卡件数，卡来源**：其全新型必须全部落进 hero-exclusive 集（= 由整栋拆分产出）
+  //     一旦某件 hero 全新型同时被量产形制消费，它就不能只从 hero 拆分里拿，来源约束即被打破。
+  // 第一栋是建库期，不参与判定（判据问的是"新建一栋"的边际成本）。
 
   for (let i = 0; i < steps.length; i++) {
     const s = steps[i];
-    const limit = s.tier === 'hero' ? THRESHOLDS.hero : THRESHOLDS.production;
-    // 第一栋是建库期，不参与判定（判据问的是"新建一栋"的边际成本）
+    const isHero = s.tier === 'hero';
+    s.isHero = isHero;
     s.isBaseline = i === 0;
-    s.limit = limit;
-    s.pass = s.isBaseline ? null : s.fresh <= limit;
+    s.limit = isHero ? null : THRESHOLDS.production;
+    s.pass = s.isBaseline
+      ? null
+      : isHero
+        ? s.freshList.every((p) => heroOnly.has(p))
+        : s.fresh <= THRESHOLDS.production;
   }
 
-  return { baseSize, steps };
+  return {
+    baseSize,
+    steps,
+    heroOnly: [...heroOnly],
+    // 「只被 hero 消费」不等于「要走 B」：其中已有 2 件由程序化路线入库（P · 0 成本、已在库），
+    // 来源裁决只管**尚未入库**的那部分 —— 混着说会把已入库件误标成待产出。
+    heroInStock: [...heroOnly].filter((p) => baseline.has(p)),
+    heroPending: [...heroOnly].filter((p) => !baseline.has(p)),
+  };
 }
 
 // ── 输出 ───────────────────────────────────────────────────────────────────
 function render(result, opts) {
-  const { baseSize, steps } = result;
+  const { baseSize, steps, heroOnly, heroInStock, heroPending } = result;
   const L = [];
   const bar = '─'.repeat(94);
 
@@ -95,7 +113,7 @@ function render(result, opts) {
     L.push('');
     L.push('  形制收敛 · 纸面分析（BUILDING-DECOMPOSITION §10.5(c)）');
     L.push(`  库基线：${baseSize} 件（kits/cn-ancient/components）`);
-    L.push(`  判定：量产形制 全新型 ≤ ${THRESHOLDS.production} · hero 形制 全新型 ≤ ${THRESHOLDS.hero}`);
+    L.push(`  判定：量产形制 全新型 ≤ ${THRESHOLDS.production} · hero 形制 不卡件数、卡来源（§10.5(b) 2026-10-11 裁决）`);
     L.push(bar);
     L.push(
       '  #  ' +
@@ -112,7 +130,15 @@ function render(result, opts) {
 
     for (let i = 0; i < steps.length; i++) {
       const s = steps[i];
-      const verdict = s.isBaseline ? '建库' : s.pass ? '✓ 过' : '✗ 超';
+      const verdict = s.isBaseline
+        ? '建库'
+        : s.isHero
+          ? s.pass
+            ? 'B源✓'
+            : '混源✗'
+          : s.pass
+            ? '✓ 过'
+            : '✗ 超';
       L.push(
         '  ' +
           String(i + 1).padEnd(3) +
@@ -147,11 +173,13 @@ function render(result, opts) {
         L.push(`    ${s.name}：—（全部复用）`);
         continue;
       }
-      const marks = s.freshList.map((p) => (s.extraFresh.includes(p) ? `${p} †` : p));
+      const marks = s.freshList.map((p) => (heroOnly.includes(p) ? `${p} ⛓` : p));
       L.push(`    ${s.name}：${marks.join(' · ')}`);
     }
     L.push('');
-    L.push(`  † = 不在 §9.2 表中。来源：${EXTRA_NOTE}`);
+    L.push(`  ⛓ = 只被 hero 形制消费的件，共 ${heroOnly.length} 件：已入库 ${heroInStock.length} 件（P · 0 成本）＝${heroInStock.join(' · ') || '—'}`);
+    L.push(`      未入库 ${heroPending.length} 件 → 必须由整栋拆分（路线 B）产出，禁止另开 AI 直生（§10.5(b) 裁决）＝${heroPending.join(' · ')}`);
+    L.push('  ★ 所有短名都应在 BUILDING-DECOMPOSITION §9.2 表内逐行存在；对账跑 `node build/convergence/reconcile.js`。');
   }
 
   // 结论
@@ -159,7 +187,7 @@ function render(result, opts) {
   const failed = judged.filter((s) => !s.pass);
   const maxAfterFirst = judged.length ? Math.max(...judged.map((s) => s.fresh)) : 0;
   const totalFresh = steps.reduce((a, s) => a + s.fresh, 0);
-  const extraTotal = steps.reduce((a, s) => a + s.extraFresh.length, 0);
+  const bTotal = steps.reduce((a, s) => a + s.bFresh.length, 0);
 
   L.push('');
   L.push(bar);
@@ -168,15 +196,25 @@ function render(result, opts) {
   L.push(`  建库期（第 1 栋，配殿）全新型：${steps[0].fresh} 件  —— 这是不可摊薄的入场费`);
   L.push(`  其后各形制全新型：${judged.map((s) => s.fresh).join(' / ')}`);
   L.push(`  其后峰值：${maxAfterFirst} 件（${judged.find((s) => s.fresh === maxAfterFirst)?.name || '—'}）`);
-  L.push(`  8 类形制累计新增：${totalFresh} 件（其中 ${extraTotal} 件是 §9.2 表未覆盖的屋顶样式件）`);
-  L.push(`  最终库规模：${steps[steps.length - 1].libAfter} 件`);
+  L.push(`  8 类形制累计新增：${totalFresh} 件（其中 ${bTotal} 件属路线 B = hero 拆分产物，不另付生成费）`);
+  L.push(`  最终库规模：${steps[steps.length - 1].libAfter} 件  —— 必须等于 BUILDING-DECOMPOSITION §9.2 的行数`);
   L.push('');
+  const prodFail = failed.filter((s) => !s.isHero);
+  const heroFail = failed.filter((s) => s.isHero);
   if (failed.length === 0) {
-    L.push(`  ✓ 全部 ${judged.length} 个形制通过门槛 —— 纸面收敛成立，值得真造。`);
+    const heroCnt = judged.filter((s) => s.isHero).length;
+    L.push(
+      `  ✓ 量产 ${judged.length - heroCnt} 个形制 ≤ ${THRESHOLDS.production} 件 · ` +
+        `hero ${heroCnt} 个形制来源约束成立 —— 纸面收敛成立，值得真造。`
+    );
   } else {
-    L.push(`  ✗ ${failed.length} / ${judged.length} 个形制超门槛：`);
-    for (const s of failed) {
-      L.push(`      ${s.name}（${s.tier}）：${s.fresh} 件 > ${s.limit}  —— ${s.freshList.join(' · ')}`);
+    L.push(`  ✗ ${failed.length} / ${judged.length} 个形制不成立：`);
+    for (const s of prodFail) {
+      L.push(`      [件数] ${s.name}（${s.tier}）：${s.fresh} 件 > ${s.limit}  —— ${s.freshList.join(' · ')}`);
+    }
+    for (const s of heroFail) {
+      const off = s.freshList.filter((p) => !heroOnly.includes(p));
+      L.push(`      [来源] ${s.name}：${off.join(' · ')} 同时被量产形制消费 → 不能只靠 hero 拆分产出`);
     }
   }
   L.push('');

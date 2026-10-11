@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/BUILDING-DECOMPOSITION.md",
+                "file": "README.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "BUILDING-DECOMPOSITION"
+              "title": "README"
             }
           }
         ]
@@ -161,7 +161,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "docs/BUILDING-DECOMPOSITION.md",
+                "file": "README.md",
                 "followCursor": false,
                 "showSearch": true,
                 "searchQuery": ""
@@ -190,19 +190,23 @@
   },
   "active": "07ffbb8b073ca0a0",
   "lastOpenFiles": [
-    "build/out/procedural-catalog.html",
-    "build/procedural/catalog.js",
-    "build/procedural/assemble.js",
-    "build/procedural/verify.js",
-    "build/out/procedural-report.json",
-    "build/out/preview-test/cn-ancient.ornament.ding-door@1.0.0/source.json",
+    "CHANGELOG.md.tmp.13924.1791735679273",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735626082",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735617080",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735574473",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735317718",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735305785",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735282449",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735276649",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735276267",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735268107",
+    "docs/BUILDING-DECOMPOSITION.md.tmp.13924.1791735250176",
+    "CHANGELOG.md",
+    "AGENTS.md",
+    "docs/PLAN.md",
+    "docs/BUILDING-DECOMPOSITION.md",
     "build/out/preview-test/cn-ancient.ornament.ding-door@1.0.0/preview.png",
-    "build/out/preview-test/cn-ancient.ornament.ding-door@1.0.0/lod0.glb",
-    "build/out/preview-test/cn-ancient.ornament.ding-door@1.0.0/asset.json",
-    "build/out/preview-test/cn-ancient.ornament.ding-door@1.0.0",
-    "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/source.json",
     "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/preview.png",
-    "build/out/preview-test/cn-ancient.railing.balustrade-corner-a@1.0.0/lod0.glb",
     "build/out/preview-test/cn-ancient.roof.gable-board-a@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.roof.ridge-tile-cylinder@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.roof.purlin-round-a@1.0.0/preview.png",
@@ -211,9 +215,6 @@
     "build/out/preview-test/cn-ancient.roof.tile-field-pantile@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.wall.qiang-corner-a@1.0.0/preview.png",
     "build/out/preview-test/cn-ancient.wall.qiang-straight-a@1.0.0/preview.png",
-    "docs/PLAN.md",
-    "README.md",
-    "AGENTS.md",
-    "CHANGELOG.md"
+    "README.md"
   ]
 }

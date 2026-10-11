@@ -5,8 +5,13 @@
  *
  * ⚠️ 本文件是**推定模型**，不是实测数据。
  *    用途：在造出任何一件构件之前，估算「每新增一个形制还需要多少全新构件」。
- *    权威真源是 docs/BUILDING-DECOMPOSITION.md §9.1（形制表）与 §9.2（45 类构件表）；
- *    本文件的取值需随两者更新。构件短名 = asset.id 的第三段。
+ *    权威真源是 docs/BUILDING-DECOMPOSITION.md §9.1（城邑形制配比）与 §9.2（**50 类**构件表）；
+ *    构件短名 = asset.id 的第三段，**必须能在 §9.2 表里逐行找到**。
+ *
+ * ★ 同步纪律（2026-10-11 新增）：本文件与 §9.1 / §9.2 / kit.json 的 `coverage.*.planned` 四方对账，
+ *    跑 `node build/convergence/reconcile.js`（漂移即非零退出）。历史上 §9.2 少 5 件屋顶样式件、
+ *    本文件却独自持有它们，两份"真源"并存的后果是下游扫表的工作流系统性漏生成 —— 不再重演。
+ *    旧的「屋顶件只活在本文件的 extra 字段里」机制已随 5 件并入 §9.2 而退役。
  *
  * 三档统计的口径见 §10.5(a)：
  *    ① 全新型       = 短名从未在任何已建形制中出现过
@@ -15,15 +20,11 @@
  *
  * 本文件只声明「型」层面的需求（① 的判定依据）。② 的尺寸层面另见 `dims` 字段，
  * 目前仅对「线性件」（直墙 / 阶条石 / 枋 / 檩）显式声明——其余件默认一型一尺寸。
+ *
+ * ★ 场景口径：本文件的 `count` 是**远期城邑**配比（§9.1 · 28 栋）。
+ *    M4 首批是**村落**（槐阴村 · §9.4），复用 `minju` / `lang` 两个形制的构件集、只改数量与材质，
+ *    **不新增形制条目**；村落数量归场景 manifest（dalu 侧产生方），不在本文件。
  */
-
-// ── §9.2 表之外、但 §9.1 形制表明确需要的补记件 ────────────────────────────
-// 来源：§9.3 批 1「20 件裸屋顶（五样式）」。
-// §9.2 的 roof 段只列了歇山系（single / lower-eave / upper-ridge），
-// 而 §9.1 的民居是**硬山**、商铺是**悬山**、亭是**攒尖**、城门楼是**庑殿**——
-// 这四种屋顶样式在 §9.2 表里**一件都没有**。本分析把它们补记进来，并标 extra。
-const EXTRA_NOTE =
-  '不在 §9.2 表中：§9.2 的 roof 段只有歇山系，未覆盖 §9.1 所需的硬山 / 悬山 / 攒尖 / 庑殿 / 盝顶';
 
 const forms = [
   {
@@ -97,7 +98,6 @@ const forms = [
       'ridge-tile-cylinder',
       'ding-door',
     ],
-    extra: { 'yingshan-single-a': EXTRA_NOTE },
   },
   {
     key: 'shangpu',
@@ -128,7 +128,6 @@ const forms = [
       'qiaoji-a',
       'ding-door',
     ],
-    extra: { 'xuanshan-single-a': EXTRA_NOTE },
   },
   {
     key: 'lang',
@@ -177,7 +176,6 @@ const forms = [
       'taoshou-a',
       'jishou-walk-a',
     ],
-    extra: { 'cuanjian-single-a': EXTRA_NOTE },
   },
   {
     key: 'paifang',
@@ -200,7 +198,6 @@ const forms = [
       'qiaoji-a',
       'ding-door',
     ],
-    extra: { 'luding-single-a': EXTRA_NOTE },
   },
   {
     key: 'zhudian',
@@ -294,17 +291,42 @@ const forms = [
       'balustrade-straight-a',
       'balustrade-corner-a',
     ],
-    extra: { 'wudian-single-a': EXTRA_NOTE },
   },
 ];
 
-// §10.5(b) 判定门槛
+// §10.5(b) 判定门槛（2026-10-11 随大人裁决改写）
 const THRESHOLDS = {
-  // 量产形制：终检全新型 ≤ 3
+  // 量产形制：终检全新型 ≤ 3 —— 这条是**真契约**（批 3 终检判失败以此为准）
   production: 3,
-  // hero 形制：§4 判据 1「复用次数 ≥ 2 的不拆」的反面 —— 只出现 1 次的 hero 件
-  // 本就不该走复用逻辑，故单列更宽的阈值。此值**未经文档确认**，仅作分析参数。
-  hero: 6,
+  // hero 形制：**不设件数门槛**。裁决 = 「卡来源、不卡件数」（§10.5(b)）。
+  // 历史注：v0.5.1 的分析在这里自用过 `hero: 6`，而文档从未承认过 6 ——
+  // 那正是「两份真源并存」的事故形状，本次连阈值一起删掉，改为下面的来源约束。
+  hero: null,
 };
 
-module.exports = { forms, THRESHOLDS, EXTRA_NOTE };
+// ★ hero 来源约束（§10.5(b) 已裁决）：只被 hero 形制消费的构件，必须由整栋拆分（路线 B）的
+//   产物入库，**禁止为 hero 单开 AI 直生**。`report.js` 用它判定 hero 行，`reconcile.js`
+//   用它核对 §9.2 的路线列。集合由本文件自动推导，不手填——手填就会再长出一份真源。
+const HERO_SOURCE_RULE = 'hero-exclusive parts must come from route B (整栋拆分产物), never AI-direct';
+
+/** 全部形制消费到的构件短名（去重 · 按 §9.2 表顺序无关） */
+function allParts() {
+  const set = new Set();
+  for (const f of forms) for (const p of f.parts) set.add(p);
+  return [...set].sort();
+}
+
+/**
+ * 「只被 hero 形制消费」的构件短名 = 路线 B 的产物集（§10.5(b) 的来源裁决）。
+ * 自动推导，不维护第二份名单。
+ */
+function heroExclusiveParts() {
+  const hero = new Set();
+  const nonHero = new Set();
+  for (const f of forms) {
+    for (const p of new Set(f.parts)) (f.tier === 'hero' ? hero : nonHero).add(p);
+  }
+  return [...hero].filter((p) => !nonHero.has(p)).sort();
+}
+
+module.exports = { forms, THRESHOLDS, HERO_SOURCE_RULE, allParts, heroExclusiveParts };
