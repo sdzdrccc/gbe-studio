@@ -6,9 +6,33 @@
  */
 
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const rt = require('../router');
 
 const REG = rt.loadAll();
+
+// ---------------------------------------------------------------------------
+// ★ 期望值一律从**真源**派生，不写死数字（X-0032 的 S-1 / S-7）。
+//   本文件的职责是验**接线**：路由器是否把注册表的内容如实端出来 —— 而不是把
+//   注册表某一天的快照复述成断言。写死值在注册表更新那天就会变成假红或假绿：
+//   `1a3180c` 之后 `1a3d71f` 加了第 4 个 unreal 实现、漏同步这里，就是实录
+//   （v0.6.0 的 CHANGELOG「已知红」节记着这件事）。
+//   ★ 唯一**故意**保留的字面量是语义动作数 `8`：那是 `AGENTS.md` 的契约数字，
+//     派生掉它 = 注册表擅自加第 9 个动作时没人报警。**契约要的是 tripwire，不是同步。**
+// ---------------------------------------------------------------------------
+
+const providerIds = () => REG.providers.providers.map((p) => p.id);
+/** 某引擎在 mcp.json 里登记的实现 id 列表（顺序即注册表顺序） */
+const mcpImplIds = (engineId) =>
+  (((REG.mcp.engines || {})[engineId] || {}).implementations || []).map((i) => i.id);
+/** 有 semantic_map.json 的引擎目录 */
+const enginesWithSemanticMap = () =>
+  fs
+    .readdirSync(path.join(__dirname, '../../../engines'), { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name)
+    .filter((n) => fs.existsSync(path.join(__dirname, '../../../engines', n, 'semantic_map.json')));
 
 let passed = 0;
 let failed = 0;
@@ -117,7 +141,11 @@ ok('provider_hint=rodin 时降级并给出警告', () => {
 
 ok('降级链读自 fallback.json，且不含 rodin', () => {
   const r = rt.route({ tier: 'component', mode: 'text' }, REG);
-  assert.deepStrictEqual(r.downgrade_chain, ['meshy', 'fal', 'hunyuan3d']);
+  // 路由器只按「在册」过滤，不按 enabled 过滤（L254）⇒ 期望值就是这份派生集
+  const expected = REG.fallback.chain.filter((id) => providerIds().includes(id));
+  assert.deepStrictEqual(r.downgrade_chain, expected, '降级链必须等于 fallback.json 声明的链（改链只改那个文件）');
+  assert.ok(!r.downgrade_chain.includes('rodin'), 'rodin 不得进链（ADR-0002）');
+  // ★「链中平台必须 enabled」已由 [7] 的同名用例守，这里**不再重复一遍**（同一事实不写两处）
 });
 
 ok('tripo 未登录 → 回退到 hunyuan3d', () => {
@@ -183,13 +211,15 @@ ok('unreal：可用，但 MCP 实现未选择 → 给出引导警告', () => {
   assert.ok(r.ok);
   assert.strictEqual(r.mcp_impl, null);
   assert.ok(r.warnings.some((w) => /MCP 实现尚未选择/.test(w)));
-  assert.strictEqual(r.mcp_candidates.length, 3, '应列出 3 个候选实现');
+  // ★ 不写数量：候选必须**逐 id 等于** mcp.json 里 unreal 的实现表（注册表加/删/改名都会在这里被发现）
+  assert.deepStrictEqual(r.mcp_candidates, mcpImplIds('unreal'), '候选须与 mcp.json 的实现表逐 id 相等');
+  assert.ok(r.mcp_candidates.length >= 1, 'unreal 至少要有一个候选');
 });
 
-ok('godot：可用，MCP 候选 1 个', () => {
+ok('godot：可用，MCP 候选与注册表一致', () => {
   const r = rt.resolveEngine('godot', REG);
   assert.ok(r.ok);
-  assert.strictEqual(r.mcp_candidates.length, 1);
+  assert.deepStrictEqual(r.mcp_candidates, mcpImplIds('godot'), '候选须与 mcp.json 的实现表逐 id 相等');
 });
 
 ok('unity：deferred → 明确报错，不静默跳过', () => {
@@ -205,14 +235,45 @@ ok('未知引擎 → 报错', () => {
 });
 
 ok('8 个语义动作是引擎适配层的稳定接口', () => {
-  assert.strictEqual(REG.engines.semantic_actions.length, 8);
-  assert.ok(REG.engines.semantic_actions.includes('viewport_capture') === false);
+  // ★ 这个 8 是 **AGENTS.md 的契约数字**（`engines/base.js` 的 8 个语义动作），**故意不从注册表派生**：
+  //   派生掉它，注册表哪天加了第 9 个动作就没人报警。要改这个数，得先改 AGENTS.md，不是改这里。
+  assert.strictEqual(REG.engines.semantic_actions.length, 8, '语义动作数 = 8（契约 · 改动须先动 AGENTS.md）');
   assert.ok(REG.engines.semantic_actions.includes('importAsset'));
+  // 反向：适配层侧每个有 semantic_map 的引擎，动作集必须与注册表**完全相等**（少一个 = 未映射，多一个 = 私造）
+  for (const name of enginesWithSemanticMap()) {
+    const map = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../../../engines', name, 'semantic_map.json'), 'utf8')
+    );
+    const actions = Object.keys(map.actions || {});
+    assert.deepStrictEqual(
+      [...actions].sort(),
+      [...REG.engines.semantic_actions].sort(),
+      `engines/${name}/semantic_map.json 的动作集与注册表不一致`
+    );
+  }
 });
 
 // ---------------------------------------------------------------------------
 console.log('\n[7] 注册表一致性（禁止第二份真源）');
 // ---------------------------------------------------------------------------
+
+ok('mcp.json 每个实现都声明 ADR-0007 的三维度（**缺键非法，null / unknown 合法**）', () => {
+  // ★ 这条是「派生化之后」补回来的报警：候选数量不再写死，所以注册表**内容**层面的偷工减料
+  //   得有地方拦。判据只认「键在不在」——`CONVENTIONS.md §20.3` 明写 `null = 未核实`、
+  //   `unknown = 未核实，不允许猜一个体面的值`，**省键**与**写 null** 是两回事：前者是逃过声明。
+  const REQUIRED = ['source', 'engine_version_range', 'maturity'];
+  const SOURCE = ['first-party', 'community'];
+  const MATURITY = ['experimental', 'beta', 'stable', 'unknown'];
+  for (const [engineId, entry] of Object.entries(REG.mcp.engines)) {
+    for (const impl of entry.implementations || []) {
+      for (const k of REQUIRED) {
+        assert.ok(k in impl, `${engineId}/${impl.id} 缺键 \`${k}\`（未核实要写 null / unknown，不许省）`);
+      }
+      assert.ok(SOURCE.includes(impl.source), `${impl.id} 的 source 取值非法：${impl.source}`);
+      assert.ok(MATURITY.includes(impl.maturity), `${impl.id} 的 maturity 取值非法：${impl.maturity}`);
+    }
+  }
+});
 
 ok('注册表中 enabled 的平台都有 capabilities.json', () => {
   for (const p of REG.providers.providers) {
