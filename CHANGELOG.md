@@ -19,6 +19,17 @@
 
 ## [未发布]
 
+## [0.6.2] - 2026-10-12
+
+### 连带同步（`gbe-assets` **ADR-0008** · `CONVENTIONS v1.5`）
+
+- **`$` 前缀的键 = 文档性注释**这一条契约裁决落在 `gbe-assets/catalog/schema/`，本仓按 `CONVENTIONS §0` 原则 5「四份文档同提交」同步指针：`docs/PLAN.md` 的 CONVENTIONS 版本 **v1.4 → v1.5**（两处：头部与 §13 结尾）、ADR 列表补 **ADR-0008**、`README.md` 文档表的版本指针同步。
+- ★ **对本仓的实际影响 —— 注册表可以正式写注释了**：`core/registry/{providers,engines,mcp}.json`、`core/policy/{fallback,budget}.json`、`bridges/registry.json`、`build/templates/tpl-hall-xieshan-double.json`、`build/procedural/material-colors.json` **共 8 份文件早就在用 `$comment`**，而它们要过的 `@gbe/schema` 此前会在概念上拒绝这种键（kit/asset 侧同理）。现在这条惯例有了契约依据，不再是"工具链违反契约"。
+- ★ 顺带记一条**踩过的坑**（同一形状我这次犯了两次）：收紧判据时只验"坏样本被拦住"、不验"合法样本别被误杀"，会写出偏严判据。上一版 `R4` 就是把铁律 3 的"封闭枚举"也纳入要求，误判出"契约一条都没落地"的红 —— 铁律 3 原文只管**向后回填**的枚举，`gbe-studio` 侧的注册表同样适用这个区分。
+
+### 变更
+- 连带同步 gbe-assets ADR-0008 / CONVENTIONS v1.5：PLAN 与 README 的版本指针、ADR 列表补 0008；本仓 8 份注册表的 $comment 惯例首次有了契约依据
+
 ## [0.6.1] - 2026-10-12
 
 ### 修正（`X-0032` 的 S-1 / S-7 · `core/policy/test/router.smoke.js` 写死期望值改派生）

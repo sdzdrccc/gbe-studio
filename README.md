@@ -238,7 +238,7 @@ node engines/base.js probe godot         # 端口连通性
 | [`CHANGELOG.md`](CHANGELOG.md) | 更新日志 |
 | [`AGENTS.md`](AGENTS.md) | AI 助手在本仓的工作纪律 |
 | `../gbe-assets/docs/DECISIONS.md` | ★ 决策台账（ADR-0001 ~ 0007） |
-| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.4 |
+| `../gbe-assets/docs/CONVENTIONS.md` | ★ 双库共享约定 v1.5 |
 
 ---
 
