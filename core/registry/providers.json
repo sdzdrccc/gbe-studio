@@ -42,11 +42,7 @@
       "tier_preference": ["component"],
       "role": "国内直连兜底 + 白模（geometry-only）构件 —— 拆件阶段首选",
       "cost_note": "低；web 通道需手工补记成本",
-      "channel_matrix": {
-        "tokenhub": { "auth": "bearer", "capabilities": ["text", "image"], "formats": ["glb", "obj"], "gate": "低（推荐默认）" },
-        "tencentcloud": { "auth": "tc3-signature", "capabilities": ["text", "image", "multiview", "geometry_only"], "formats": ["glb", "obj", "fbx", "stl", "usdz"], "gate": "中（需腾讯云账号）" },
-        "web": { "auth": "browser-session", "mode": "semi-automatic", "capabilities": ["text", "image"], "gate": "最低（官网网页版，人工交互）" }
-      }
+      "$comment": "channel_matrix 的真源在 providers/hunyuan3d/capabilities.json（router.js 只读它）—— 此处不重复维护，两份副本必然分歧（X-0032 S-5）。"
     },
     {
       "id": "fal",

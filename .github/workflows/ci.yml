@@ -1,0 +1,47 @@
+name: CI
+
+# Three gates in this repo (same source as AGENTS.md section 4 checklist and the pre-push hook):
+#   1. node scripts/version.js check     -- VERSION / CHANGELOG / mirror / change records agree
+#   2. node bridges/sync-ports.js --check -- read-only port view is fresh, AND the port copies
+#      in mcp.json / engines.json cross-check against the gbe-assets/catalog/ports.json truth
+#   3. npm test                          -- router smoke (the entity behind package.json "test")
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # version.js check judges "unrecorded changes" via a git baseline, so full history is required
+          fetch-depth: 0
+
+      # The port truth source lives in the gbe-assets repo (CONVENTIONS section 18).
+      # Check it out as a sibling directory (same layout as local dev), then point
+      # GBE_ASSETS_REPO at it (resolution order mirrors core/schema-ref.js).
+      - name: Checkout gbe-assets (port truth source)
+        uses: actions/checkout@v4
+        with:
+          repository: sdzdrccc/gbe-assets
+          path: ../gbe-assets
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: version.js check
+        run: node scripts/version.js check
+
+      - name: sync-ports.js --check
+        env:
+          GBE_ASSETS_REPO: ${{ github.workspace }}/../gbe-assets
+        run: node bridges/sync-ports.js --check
+
+      - name: npm test
+        run: npm test

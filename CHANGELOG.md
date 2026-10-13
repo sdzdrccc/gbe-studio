@@ -19,6 +19,18 @@
 
 ## [未发布]
 
+## [0.6.4] - 2026-10-13
+
+### 变更
+- **X-0032 遗留 S 类六修**（guild 审阅卡归口 gbe-studio 的未修项；S-1/S-7 已在 v0.6.1/v0.6.2 修毕）：
+  - **S-2**：端口唯一性判据改按**端口号**做键（端口是 127.0.0.1 主机级全局资源，`godot:8000` 与 `unreal:8000` 同机即冲突 —— 原 `${engine}:${port}` 键让跨引擎同端口永不触发）；合法性下界 `> 1024` → `>= 1024`（1024 是合法端口）
+  - **S-3**：`sync-ports.js --check` 新增**三份副本交叉校验** —— `mcp.json` 各 implementation 的端口数字、`engines.json` 各引擎的端口 ID，都必须能在 `gbe-assets/catalog/ports.json` 真源里找到（此前 `--check` 只比对生成视图与自身，副本写错仍绿）
+  - **S-4**：`by_engine` 改为从端口记录**派生**（id 第一段），不再写死四个引擎家族 —— 新引擎登记进真源即自动出现；对现有数据生成的 `registry.json` **逐字节不变**
+  - **S-5**：`core/registry/providers.json` 删除 `channel_matrix` 重复字段（真源在 `providers/hunyuan3d/capabilities.json`，router 只读它；两份副本必然分歧）
+  - **S-6**：**新建 `.github/workflows/ci.yml`**（version check ＋ sync-ports --check ＋ npm test，node 20/22 矩阵；同级检出 gbe-assets 并用 `GBE_ASSETS_REPO` 指过去）；README 对空壳目录按自身图例补「（留位）」标注
+  - **S-8**：`sync-ports.js` 的 `SOURCE` 改为读 **`GBE_ASSETS_REPO`** 环境变量（缺省回退同级目录），与 `core/schema-ref.js` 同款 —— 此前提示让人用该变量而代码从不读它
+- 测试：router.smoke **26 通过 / 0 失败**；新判据反向用例全部实测（S-2 三组 · S-3 两组 · S-8 一组，篡改均还原）
+
 ## [0.6.3] - 2026-10-13
 
 ### 变更

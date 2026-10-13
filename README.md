@@ -46,6 +46,9 @@ gbe-studio/
 ├── gbe.config.example.json      本机配置样板（真实 gbe.config.json 不入库）
 ├── .gitattributes               统一 LF、二进制标记
 ├── .gitignore                   排除凭证 / 本机配置 / runs / raw
+├── .github/
+│   └── workflows/
+│       └── ci.yml               CI：push / PR 触发，node 20·22 矩阵跑三闸门（版本校验 · 端口视图校验 · 路由冒烟）
 │
 ├── core/                    核心：策略、契约、注册表
 │   ├── registry/            ★   三张真源注册表 —— 一切「启用什么」由此决定，禁止写死在代码
@@ -81,9 +84,9 @@ gbe-studio/
 │   ├── plans/                       拆分计划落盘（builder 产出）
 │   └── out/                         拆分产物（glb 构件 + 隔离件）
 │
-├── refine/                  ③ 精修层（Blender）
-│   ├── recipes/                     声明式精修配方
-│   └── fallback/                    应急链（重拓扑等无法自动复现时的人工/半自动路径）
+├── refine/                  ③ 精修层（Blender）（留位）
+│   ├── recipes/                     声明式精修配方（留位）
+│   └── fallback/                    应急链（重拓扑等无法自动复现时的人工/半自动路径）（留位）
 │
 ├── build/                   ⑤ 装配层 ★
 │   ├── procedural/          ★   程序化构件生成（零依赖，0 credit）
@@ -111,21 +114,21 @@ gbe-studio/
 ├── bridges/                 MCP 桥治理
 │   ├── sync-ports.js        ★   从 `gbe-assets/catalog/ports.json` 生成只读端口视图（`--check` / `--probe`）
 │   ├── registry.json            **只读视图**，由 sync-ports 生成 —— 禁止手改
-│   ├── profiles/                引擎 Profile（每个引擎暴露哪些工具）
-│   └── router-server/           Bridge Router 聚合服务（终态：≤24 个语义工具）
+│   ├── profiles/                引擎 Profile（每个引擎暴露哪些工具）（留位）
+│   └── router-server/           Bridge Router 聚合服务（终态：≤24 个语义工具）（留位）
 │
 ├── cmd/                     ⑤ 子命令入口（每个目录一个命令，薄壳）
-│   ├── gbe-set/                     环境与凭证设置
-│   ├── gbe-gen/                     发起生成
-│   ├── gbe-decompose/               构件拆分
-│   ├── gbe-refine/                  Blender 精修
-│   ├── gbe-build/                   装配清单生成与校验
-│   ├── gbe-ship/                    打包投递到 gbe-assets/inbox
-│   ├── gbe-engine/                  引擎落地
-│   └── gbe-cost/                    成本账本查询
+│   ├── gbe-set/                     环境与凭证设置（留位）
+│   ├── gbe-gen/                     发起生成（留位）
+│   ├── gbe-decompose/               构件拆分（留位）
+│   ├── gbe-refine/                  Blender 精修（留位）
+│   ├── gbe-build/                   装配清单生成与校验（留位）
+│   ├── gbe-ship/                    打包投递到 gbe-assets/inbox（留位）
+│   ├── gbe-engine/                  引擎落地（留位）
+│   └── gbe-cost/                    成本账本查询（留位）
 │
-├── pipeline/                    提示词库与流水线编排
-├── qa/                          QA Gate 门禁
+├── pipeline/                    提示词库与流水线编排（留位）
+├── qa/                          QA Gate 门禁（留位）
 ├── scripts/                 ★   仓库自身工具
 │   ├── version.js               版本工具：show / log / bump / check / sync
 │   ├── install-hooks.js         启用 Git 钩子（core.hooksPath）

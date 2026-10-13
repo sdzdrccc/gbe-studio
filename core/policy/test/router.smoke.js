@@ -291,14 +291,19 @@ ok('fallback 链中的平台都是 enabled', () => {
 });
 
 ok('mcp.json 中每个实现声明的端口都在期望范围内', () => {
-  const seen = new Set();
+  // 端口是 127.0.0.1 主机级全局资源 —— 唯一性判据只按端口号，不按引擎限定：
+  // godot:8000 与 unreal:8000 在同一台机器上就是同一个冲突，按 `${engine}:${port}` 做键
+  // 会让跨引擎同端口永不触发（X-0032 S-2）。
+  const seen = new Map(); // port -> "engine/impl"（首个登记者）
   for (const [engine, entry] of Object.entries(REG.mcp.engines)) {
     for (const impl of entry.implementations) {
       for (const port of impl.ports || []) {
-        assert.ok(port > 1024 && port < 65536, `${engine}/${impl.id} 端口非法：${port}`);
-        const key = `${engine}:${port}`;
-        assert.ok(!seen.has(key), `端口重复：${key}`);
-        seen.add(key);
+        // 1024 是合法端口（registered 范围 1024–49151 的下界），> 1024 会把它误判非法
+        assert.ok(port >= 1024 && port < 65536, `${engine}/${impl.id} 端口非法：${port}`);
+        const label = `${engine}/${impl.id}`;
+        const prev = seen.get(port);
+        assert.ok(!prev, `端口重复：${port}（${prev} 与 ${label}）—— 主机级全局资源，跨引擎同号也算冲突`);
+        seen.set(port, label);
       }
     }
   }
