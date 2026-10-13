@@ -104,3 +104,57 @@
 3. 都没有 —— **不要擅自定**，把选项与权衡摆出来问人；得到答复后**落一条 ADR** 再动手
 
 > `DECISIONS.md` 是**只追加**的。推翻旧裁决 = 新增一条 `supersedes: ADR-xxxx`，不改历史条目。
+
+---
+
+## 6. 文档地图 —— 什么住哪里 · 叫什么（★ 硬约束 · **2026-10-13 新增**）
+
+> ★ 来源：2026-10-13 大人「四个仓库问题都改了吗」→ 裁定「**全量对推**」。
+> ★ 与 `qiuyuan-guild/AGENTS.md` **§8 文档地图**同源（那边先立，这里按本仓实情对齐）。
+
+**判据**：★ **先问"这东西是谁产生的"** —— ★ 产生方在哪，它（和它的文档）就住哪（与 §2 纪律 1~4 同源）。
+★ **命名再加一问**：**"这个名字是从哪来的？"** —— 来自**上游标识** ⇒ 跟随它；来自**文档标题** ⇒ 全大写。
+
+### 6.1 落点表（★ 本仓**实际存在**的）
+
+| 类 | 位置 | 命名 | 说明 |
+|---|---|---|---|
+| **开工纪律** | 仓根 `AGENTS.md` | 固定名 | ★ 本文件；★ 改它要写进 `CHANGELOG.md` 的新条目 |
+| **本仓方案** | `docs/` | `UPPER-KEBAB.md` | `PLAN.md`（生产端完整方案）· `BUILDING-DECOMPOSITION.md`（场景建筑拆分细化方案） |
+| **版本真源** | `VERSION` ＋ `CHANGELOG.md` | 固定名 | ★ **不许手改** —— 一律走 `node scripts/version.js`（§2.7）；★ `package.json.version` 同理 |
+| **策略 / 注册表**（数据，非文档） | `core/policy/` · `core/registry/` | `kebab-case.json` | `providers.json` · `engines.json` · `mcp.json` · `fallback.json` · `budget.json` |
+| **引擎适配** | `engines/<engine>/` | 目录小写 | `semantic_map.json`（8 个语义动作的落地映射） |
+| **流水线五层** | `providers/`（①生成）`decompose/`（②拆分）`refine/`（③精修）`engines/`（④集成）`build/`（⑤装配） | 目录小写-kebab | ★ 见根 `README.md`「五层流水线」 |
+| **QA / MCP 桥 / 子命令** | `qa/` · `bridges/` · `cmd/` | 目录小写-kebab | `bridges/registry.json` **是产物**，★ **别手改**（§2.3） |
+| **仓库自身工具** | `scripts/` | `kebab-case.js` | `version.js` · `install-hooks.js` · `hooks/pre-push` |
+| **投递 / 运行产物** | `inbox` 类目录 · `runs/` · `raw/` | —— | ★ **不进版本库**（§4 自检清单末条） |
+| ★★ **上游真源（不在本仓）** | `../gbe-assets/docs/` | —— | ★★ **`DECISIONS.md`（裁决台账）· `CONVENTIONS.md`（工程约定）· `PLAN.md` 都住那里** —— ★ 本仓**只读**（§5） |
+| ★★ **端口真源（不在本仓）** | `../gbe-assets/catalog/ports.json` | —— | ★ 改端口**只改它**，然后跑 `node bridges/sync-ports.js`（§2.3） |
+
+### 6.2 命名硬约束
+
+1. ★ **文档一律 `.md` ＋ 全大写-连字符**（`PLAN.md` · `BUILDING-DECOMPOSITION.md`）。★ 不用空格、不用驼峰。
+2. ★★ **文件名与目录名一律 ASCII** —— ★ 实测本仓当前 **0 个非 ASCII 名**，★ **保持**；
+   ★ 要写中文说明就写进文档**正文**，★ **别写进文件名**。
+3. **目录名一律小写-kebab** · **JSON 配置一律 kebab-case** · **脚本一律 kebab-case.js**。
+4. **不留空壳** —— 没有内容可写的文件不要建（占位 = 把"还没想清楚"伪装成"已完成"）。
+
+---
+
+## 7. 文档的**移动**与**作废**（★ **删除见 §2.6**）
+
+> ★ 来源同 §6。★ **删除**的纪律**已经在 §2.6**（先列清单 · 投递目录 move 归档 · **禁 `rm -rf`**）——
+> ★ 本节**只补它没写的两件**（移动 / 作废），★ **不重复 §2.6**（一条知识两处写 = 迟早不一致）。
+
+1. ★★ **移动即改引用** —— 任何**移动 / 重命名**（文件或目录），**同一笔提交**里改完所有引用：
+   ```bash
+   grep -rn --include=*.md --include=*.js --include=*.json -- "<旧文件名>" F:/zxc/Project/
+   ```
+   ★ **四仓全查**（`gbe-studio` / `gbe-assets` / `qiuyuan-guild` / `qiuyuan-dalu`）——
+   ★ 本仓的路径**常被另外三仓只读引用**（如 `AGENTS.md` §2.3 的 `../gbe-assets/catalog/ports.json`）。
+   ★★ **`git ls-files` 会把非 ASCII 路径转成八进制转义** ⇒ 数这类文件名要用 `os.walk` 复核，★ 否则**假绿 0**。
+2. **作废留指针** —— 作废件**不删**：★ 首行写作废声明并**指向正解**；
+   ★ 直接删掉而不留指针，★ **下一个人会重新踩**。
+3. ★★ **ADR 不受本节管** —— ★ 裁决台账住 `../gbe-assets/docs/DECISIONS.md`，**只追加**：
+   ★ 推翻旧裁决 = **新增**一条 `supersedes: ADR-xxxx` 的；★ **历史条目一个字都不许改**（§5 末句同源）。
+4. **判据**：★ **"这个文件还有没有人读？"** —— 没人读且不会再有 ⇒ ★ 按 **§2.6** 处理；★ 还有人读 ⇒ **改，不删**。
