@@ -2,16 +2,16 @@
   "$comment": "★ 只读视图 —— 由 bridges/sync-ports.js 从 gbe-assets/catalog/ports.json 生成。请勿手工编辑（会被覆盖）；改端口请改真源后重跑 sync-ports.js。",
   "generated_from": "../gbe-assets/catalog/ports.json",
   "generated_by": "bridges/sync-ports.js",
-  "source_updated_at": "2026-09-15",
+  "source_updated_at": "2026-10-17",
   "ports_version": "1",
   "authority": "gbe-assets/catalog/ports.json",
   "summary": {
-    "total": 10,
+    "total": 11,
     "owned_by_studio": 8,
     "active": 6,
     "reserved": 1,
     "deferred": 1,
-    "owned_by_assets": 2
+    "owned_by_assets": 3
   },
   "studio_ports": {
     "godot-mcp": {
@@ -63,13 +63,18 @@
   },
   "deferred_ports": {
     "unity-mcp": {
-      "port": 8080,
+      "port": 8090,
       "protocol": "http",
       "purpose": "Unity MCP —— 预留，当前不占用",
-      "note": "ADR-0004：Unity 延后。端口保留以免将来冲突。"
+      "note": "ADR-0004：Unity 延后。端口保留以免将来冲突。\n★ 2026-10-17（guild X-0050 / ADR-0029③）：原占 8080，因 8080 已被真实在跑的\n★ qiuyuan-game-ws 实际占用（保留位被实际服务占据 = 这条保留早已失效），\n★ 故把保留位挪到 8090 —— ★ 挪的是「没人用的预留」，不是「已经在听的生产端口」。"
     }
   },
   "reserved_by_others": {
+    "qiuyuan-game-ws": {
+      "port": 8080,
+      "owner": "qiuyuan-dalu",
+      "purpose": "虬渊大陆游戏服务端 qydalud —— 客户端 WS（/ws）＋ GM 后台 REST（/api/stats · /api/gm/config）"
+    },
     "gbe-assets-api": {
       "port": 8788,
       "owner": "gbe-assets",
@@ -96,7 +101,7 @@
       8000
     ],
     "unity": [
-      8080
+      8090
     ]
   }
 }

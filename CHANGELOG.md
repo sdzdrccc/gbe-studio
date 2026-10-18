@@ -19,6 +19,11 @@
 
 ## [未发布]
 
+## [0.6.5] - 2026-10-18
+
+### 变更
+- 端口视图随 gbe-assets v0.7.0 同步（bridges/registry.json 重生成 · 新增 qiuyuan-game-ws:8080 · unity-mcp→8090）
+
 ## [0.6.4] - 2026-10-13
 
 ### 变更
