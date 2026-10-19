@@ -160,9 +160,9 @@
       "implementations": [],
       "deferred_reason": "ADR-0004：Unity 延后，注册表中不列实现。",
       "candidates_for_future": [
-        { "id": "coplaydev-unity-mcp", "repo": "https://github.com/CoplayDev/unity-mcp", "note": "MIT、最活跃；约 47 个工具入口；需要 Unity 2021.3+ 与 Python/uv", "port": 8080 },
+        { "id": "coplaydev-unity-mcp", "repo": "https://github.com/CoplayDev/unity-mcp", "note": "MIT、最活跃；约 47 个工具入口；需要 Unity 2021.3+ 与 Python/uv", "port": 8090 },
         { "id": "unity-official-mcp", "repo": "Unity AI Assistant 包", "note": "官方路线；需要 Unity 6 + 连接 Unity Cloud + 商业订阅", "port": null },
-        { "id": "bluepuff71-unitymcp", "repo": "https://github.com/Bluepuff71/UnityMCP", "note": "纯 C# 原生，仅需 Package，无需外部运行时；51 工具", "port": 8080 }
+        { "id": "bluepuff71-unitymcp", "repo": "https://github.com/Bluepuff71/UnityMCP", "note": "纯 C# 原生，仅需 Package，无需外部运行时；51 工具", "port": 8090 }
       ]
     }
   }

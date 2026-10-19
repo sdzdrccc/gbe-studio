@@ -115,22 +115,35 @@ function buildByEngine(active, reserved, deferred) {
 }
 
 /**
- * 端口三份副本的交叉校验（X-0032 S-3）—— `--check` 专用。
+ * 端口三份副本的交叉校验（X-0032 S-3；2026-10-19 `X-0053` S-2 扩面）—— `--check` 专用。
  *
  * 端口在仓内有三个副本，此前各自维护、互不交叉校验：
  *   真源        gbe-assets/catalog/ports.json（端口记录，含 id / port / status）
- *   副本一      core/registry/mcp.json 各 implementation.ports（裸端口数字）
+ *   副本一      core/registry/mcp.json 各 implementation.ports / candidates_for_future[].port
  *   副本二      core/registry/engines.json 各引擎 ports（端口 ID 字符串数组）
  *   只读视图    bridges/registry.json（由本脚本从真源生成，上面已比对）
- * 本函数补上「副本 ↔ 真源」的两向校验，任一不一致即返回明细（调用方据此退出 1）。
  *
+ * ★ 2026-10-19 的两处加严（`X-0053` S-2 的实证：unity 预留位真源已挪 8090，四个副本仍写 8080，
+ *   而 `--check` 依然绿）：
+ *   ① **`candidates_for_future` 也要扫**（此前只扫 `implementations`）；
+ *   ② **不只查「这个号存在」，还要查「这个号归不归这个引擎」** ——
+ *      判定依据：`engines.json[engine].ports` 里列了哪些端口 ID，那些 ID 在真源里的号就是该引擎的号。
+ *      ★ 少了②，8080（属 `qiuyuan-game-ws`）会被当成 unity 的合法端口，等于没校验。
+ *
+ * @param {object} source 端口真源（至少含 `ports: [{id, port}]`）
+ * @param {{mcp?: object, engines?: object}} [opts] 测试注入用；缺省读本仓注册表
  * @returns {string[]} 不一致明细（空数组 = 全部一致）
  */
-function crossCheckRegistries(source) {
+function crossCheckRegistries(source, opts = {}) {
   const errors = [];
   // 真源端口清单：active / reserved / deferred / others（他仓占用）全算
   const knownPorts = new Set(source.ports.map((p) => p.port));
   const knownIds = new Set(source.ports.map((p) => p.id));
+  const idsOfPort = new Map(); // port -> [id]
+  for (const p of source.ports) {
+    if (!idsOfPort.has(p.port)) idsOfPort.set(p.port, []);
+    idsOfPort.get(p.port).push(p.id);
+  }
 
   const readRegistry = (file, label) => {
     if (!fs.existsSync(file)) {
@@ -145,24 +158,52 @@ function crossCheckRegistries(source) {
     }
   };
 
-  // ① mcp.json：每个 implementation 的每个端口数字，必须能在 ports.json 找到同号条目
-  const mcp = readRegistry(MCP_REGISTRY, 'core/registry/mcp.json');
+  const engines = opts.engines || readRegistry(ENGINES_REGISTRY, 'core/registry/engines.json');
+
+  // 引擎 → 允许的端口号集合（由 engines.json 的端口 ID 列表经真源换算）
+  const allowedPorts = new Map();
+  if (engines) {
+    for (const eng of engines.engines || []) {
+      const set = new Set();
+      for (const portId of eng.ports || []) {
+        for (const p of source.ports) if (p.id === portId) set.add(p.port);
+      }
+      allowedPorts.set(eng.id, set);
+    }
+  }
+
+  /** 同一条判据，给 implementations 与 candidates 共用 */
+  const checkPort = (engineId, who, port) => {
+    if (port === null || port === undefined) return; // 未定端口 = 合法（如官方实现走默认）
+    if (!knownPorts.has(port)) {
+      errors.push(`${who} 声明端口 ${port}，但 ports.json 无同号条目（端口真源不同步）`);
+      return;
+    }
+    const allowed = allowedPorts.get(engineId);
+    if (allowed && !allowed.has(port)) {
+      errors.push(
+        `${who} 声明端口 ${port}，但该号在真源里属 ${idsOfPort.get(port).join('/')}，` +
+          `不在 engines.json ${engineId}.ports 的声明内（★ 预留位可能已被他仓征用）`
+      );
+    }
+  };
+
+  // ① mcp.json：implementations 与 candidates_for_future 的每个端口号
+  const mcp = opts.mcp || readRegistry(MCP_REGISTRY, 'core/registry/mcp.json');
   if (mcp) {
     for (const [engineId, entry] of Object.entries(mcp.engines || {})) {
       for (const impl of entry.implementations || []) {
         for (const port of impl.ports || []) {
-          if (!knownPorts.has(port)) {
-            errors.push(
-              `mcp.json ${engineId}/${impl.id} 声明端口 ${port}，但 ports.json 无同号条目（端口真源不同步）`
-            );
-          }
+          checkPort(engineId, `mcp.json ${engineId}/${impl.id}`, port);
         }
+      }
+      for (const cand of entry.candidates_for_future || []) {
+        checkPort(engineId, `mcp.json ${engineId}/candidates:${cand.id}`, cand.port);
       }
     }
   }
 
   // ② engines.json：每个引擎 ports 数组里的每个端口 ID，必须能在 ports.json 找到同 id 条目
-  const engines = readRegistry(ENGINES_REGISTRY, 'core/registry/engines.json');
   if (engines) {
     for (const eng of engines.engines || []) {
       for (const portId of eng.ports || []) {

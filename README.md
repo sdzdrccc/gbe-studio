@@ -18,7 +18,10 @@
 ⑤ 装配层 ★    L0 建筑 = 构件 + 插槽绑定，写装配清单
 ```
 
-横切三项：**CostLedger 账本** · **QA Gate 门禁** · **MCP 桥治理（实现可切换）**。
+横切三项（★ **2026-10-19 按实现现状标注**，别把"留位"读成"已有"）：
+**CostLedger 账本**（`core/contracts/ledger-entry.schema.json` 已定 · **实现未做**）·
+**QA Gate 门禁**（★ **由共享 `@gbe/schema` 的出包门禁承担**；本仓 `qa/` **仅留位**，无实现）·
+**MCP 桥治理**（✅ 已落：`bridges/` ＋ `core/registry/mcp.json` ＋ `engines/base.js`）。
 
 ---
 
@@ -59,7 +62,7 @@ gbe-studio/
 │   │   ├── router.js        ★   平台选择策略：五步决策（可用性 → 形态 → 优先表 → 成本闸门 → 降级链）
 │   │   ├── fallback.json        降级链（meshy → fal → hunyuan3d）
 │   │   ├── budget.json          成本闸门（单件 / 单批上限、余额下限）
-│   │   └── test/router.smoke.js 路由冒烟测试（25 项）
+│   │   └── test/router.smoke.js 路由冒烟测试（★ 条数以输出为准，勿抄）
 │   ├── contracts/           ★   内部契约（JSON Schema）
 │   │   ├── generation-job.schema.json        一次生成作业的输入
 │   │   ├── generation-artifact.schema.json   平台产出的原始件
@@ -202,7 +205,7 @@ npm run hooks:install             # → git config core.hooksPath scripts/hooks
 ## 快速开始
 
 ```bash
-node core/policy/test/router.smoke.js    # 路由策略冒烟测试（25 项）
+node core/policy/test/router.smoke.js    # 路由策略冒烟测试（★ 条数以输出为准）
 node core/policy/router.js route '{"tier":"component","mode":"text"}'
 node core/policy/router.js engine unity  # → 明确报错"引擎未启用"（ADR-0004）
 
@@ -226,7 +229,7 @@ node engines/base.js probe godot         # 端口连通性
 | Unreal Python Remote Exec / Remote Control | 6776 (UDP) / 30010 |
 | Unreal 备选实现 | 8091 / 55557（仅选中该实现时占用） |
 | **Unreal 官方 MCP（预留）** | **8000**（UE 5.8+ 内置，**已登记未启用**，ADR-0007） |
-| ~~Unity MCP~~ | 8080（**延后，当前不占用**） |
+| ~~Unity MCP~~ | 8090（**延后，当前不占用**；★ 8080 自 2026-10-18 起属 `qiuyuan-game-ws`） |
 
 > **端口真源不在这里** —— 在 `gbe-assets/catalog/ports.json`。本仓 `bridges/registry.json` 是从它生成的**只读视图**。改端口请改真源，再跑 `node bridges/sync-ports.js`。
 

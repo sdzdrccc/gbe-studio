@@ -58,7 +58,8 @@ function createAdapter(engineId, opts = {}) {
     const err = new Error(
       `${engineId}: MCP 实现尚未选择（active=null）。可用候选：` +
         (entry ? entry.implementations.map((i) => i.id).join(', ') : '（无）') +
-        `\n  选择命令：gbe-engine mcp use ${engineId} <impl-id>`
+        `\n  验证某个实现（不改注册表）：node engines/base.js validate ${engineId} --impl <impl-id>` +
+        `\n  选定实现：改 core/registry/mcp.json 的 active（★ \`gbe-engine\` 子命令仍是留位，未实现）`
     );
     err.code = 'MCP_NOT_SELECTED';
     throw err;
@@ -168,6 +169,15 @@ function probePort(port, transport) {
 
 function main(argv) {
   const [cmd, engineId] = argv;
+  // ★ `--impl <id>`：不改注册表、不选 active，单纯"就这个实现验一下"（`X-0053` S-3）。
+  //   没有它，ADR-0005 的 `active:null` 会让 `validate <engine>` **永远**报 MCP_NOT_SELECTED ——
+  //   而 AGENTS §4 却把它列为自检项（自检项不可达 = 假绿）。
+  const implIdx = argv.indexOf('--impl');
+  const implOverride = implIdx >= 0 ? argv[implIdx + 1] : null;
+  if (implIdx >= 0 && !implOverride) {
+    console.error('✗ --impl 需要一个实现 id（例：--impl unreal-official-mcp）');
+    return 2;
+  }
   if (cmd === 'list') {
     const engines = loadEngineRegistry();
     const mcp = loadMcpRegistry();
@@ -186,11 +196,11 @@ function main(argv) {
 
   if (cmd === 'validate') {
     if (!engineId) {
-      console.error('用法：node engines/base.js validate <engine>');
+      console.error('用法：node engines/base.js validate <engine> [--impl <impl-id>]');
       return 2;
     }
     try {
-      const adapter = createAdapter(engineId);
+      const adapter = createAdapter(engineId, { implOverride });
       const st = adapter.mappingStatus();
       console.log(`\n实现：${st.implementation}  映射状态：${st.status}`);
       console.log(`语义动作覆盖：${st.mapped}/${st.total}`);
@@ -210,7 +220,7 @@ function main(argv) {
       return 2;
     }
     try {
-      const adapter = createAdapter(engineId);
+      const adapter = createAdapter(engineId, { implOverride });
       adapter.probePorts().then((r) => {
         console.log(`\n${engineId}/${adapter.implId} 端口探测：`);
         for (const [p, s] of Object.entries(r)) {
@@ -226,8 +236,8 @@ function main(argv) {
 
   console.log('用法：');
   console.log('  node engines/base.js list');
-  console.log('  node engines/base.js validate <engine>');
-  console.log('  node engines/base.js probe <engine>');
+  console.log('  node engines/base.js validate <engine> [--impl <impl-id>]');
+  console.log('  node engines/base.js probe <engine> [--impl <impl-id>]');
   return 2;
 }
 

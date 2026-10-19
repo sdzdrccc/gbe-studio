@@ -90,7 +90,7 @@
 - [ ] **动过 §9.2 构件表 / `build/convergence/forms.js` / `kits/*/kit.json` 的 `coverage`** → `node build/convergence/reconcile.js` 全绿（三方对账：表 = 代码 = 分母；漂移即非零退出）
 - [ ] `node bridges/sync-ports.js --check` 通过
 - [ ] 新增平台/引擎/实现 → 注册表里有记录，且 `capabilities.json` 如实声明（不谎报 quad / 白模等能力）
-- [ ] 新增语义映射 → `node engines/base.js validate <engine>` 显示 8/8
+- [ ] 新增语义映射 → `node engines/base.js validate <engine> --impl <impl-id>` **能跑通并如实报 `n/8`**（★ `--impl` 是 2026-10-19 补的：`active:null` 下不带它必报 `MCP_NOT_SELECTED`，旧写法**永远达不到**；★ `status:unmapped` 时 `0/8` 是**诚实结果**，不是失败；`8/8` 只在映射填完且 `status:mapped` 后成立）
 - [ ] 没有在代码里写死平台名、工具名、模数、面数预算、category 枚举
 - [ ] 没有提交凭证、`gbe.config.json`、`runs/`、`raw/`
 - [ ] 涉及契约变更 → `gbe-assets` 侧 schema、CONVENTIONS、两份 PLAN 同提交同步

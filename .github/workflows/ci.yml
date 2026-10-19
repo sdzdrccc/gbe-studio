@@ -22,13 +22,14 @@ jobs:
           fetch-depth: 0
 
       # The port truth source lives in the gbe-assets repo (CONVENTIONS section 18).
-      # Check it out as a sibling directory (same layout as local dev), then point
-      # GBE_ASSETS_REPO at it (resolution order mirrors core/schema-ref.js).
+      # Check it out INSIDE the workspace: actions/checkout rejects any `path` that
+      # escapes $GITHUB_WORKSPACE ("../gbe-assets" made this step fail, so none of the
+      # three gates ever ran -- X-0053 S-1).
       - name: Checkout gbe-assets (port truth source)
         uses: actions/checkout@v4
         with:
           repository: sdzdrccc/gbe-assets
-          path: ../gbe-assets
+          path: gbe-assets
 
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -40,7 +41,7 @@ jobs:
 
       - name: sync-ports.js --check
         env:
-          GBE_ASSETS_REPO: ${{ github.workspace }}/../gbe-assets
+          GBE_ASSETS_REPO: ${{ github.workspace }}/gbe-assets
         run: node bridges/sync-ports.js --check
 
       - name: npm test

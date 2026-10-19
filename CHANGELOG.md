@@ -19,6 +19,19 @@
 
 ## [未发布]
 
+## [0.6.6] - 2026-10-19
+
+### 修错
+- **CI 越界**：第二个 checkout 的 `path: ../gbe-assets` 逃出 `$GITHUB_WORKSPACE`，该步直接失败 ⇒ **三个门禁一个都跑不到**；改为工作区内 `gbe-assets`，`GBE_ASSETS_REPO` 同步
+- **端口副本**：Unity 预留位真源已挪 **8090**，而 `mcp.json`（两个候选）/ `engines.json` / `README` / `PLAN` 四处仍写 8080 → 全改 8090，并注明 8080 自 2026-10-18 起归 `qiuyuan-game-ws`
+- **`validate` 不可达**：`--impl` 只在内部 API、CLI 未解析 ⇒ `active:null`（ADR-0005）下**恒红**；现接通 `validate <engine> --impl <id>`，错误提示不再指向未实现的 `gbe-engine` 子命令
+
+### 新增
+- **测试 1 套 → 4 套**：`build/procedural/test/procedural.smoke.js`（18 件 · 确定性 / 0.5 网格 / 预算 / GLB 读回）、`core/test/schema-ref.smoke.js`（单源解析 / 正反例 / v1 闸门）、`bridges/test/ports.smoke.js`（端口归属反向用例）
+- **端口校验加严**：`sync-ports.js` 扫 `candidates_for_future`，并**校验端口归属** —— 此前只查"这个号存在"，8080 属他仓也能过（`--check` 绿灯的假象）
+- **版本校验扩面**：README 禁硬编码版本号（代码块豁免）＋ 嵌套 `package.json` 版本对齐
+- **README 诚实化**：横切三项按实现现状标注（CostLedger 实现未做 / QA Gate 由共享 `@gbe/schema` 承担、`qa/` 留位 / MCP 桥已落）；测试条数改为"以输出为准"
+
 ## [0.6.5] - 2026-10-18
 
 ### 变更

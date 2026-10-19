@@ -276,6 +276,31 @@ function cmdBump(argv) {
 
 // ─────────────────────────── check ───────────────────────────
 
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.cache', 'runs', 'raw', 'inbox', '_archive']);
+
+/**
+ * 找出根目录以下的 `package.json`（用于 `X-0053` S-6：嵌套包的 version 也要跟 VERSION 对齐）。
+ * ★ 只扫 3 层、跳过产物与依赖目录 —— 宁可漏扫，不可把 `node_modules` 里的包当成"我们的镜像"。
+ */
+function findNestedPackageJsons(dir, depth) {
+  const out = [];
+  if (depth > 3) return out;
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const e of entries) {
+    if (!e.isDirectory() || SKIP_DIRS.has(e.name)) continue;
+    const full = path.join(dir, e.name);
+    const pkg = path.join(full, 'package.json');
+    if (fs.existsSync(pkg)) out.push(pkg);
+    out.push(...findNestedPackageJsons(full, depth + 1));
+  }
+  return out;
+}
+
 function cmdCheck(argv) {
   const quiet = argv.includes('--quiet');
   const errors = [];
@@ -314,6 +339,39 @@ function cmdCheck(argv) {
   const mirror = readMirrorPkg();
   if (mirror && version && mirror.pkg.version !== version) {
     errors.push(`package.json version（${mirror.pkg.version}）与 VERSION（${version}）不一致`);
+  }
+
+  // 3b) README 不得硬编码版本号（`X-0053` S-6）
+  //     ★ 门面用动态徽章（shields.io/github/v/tag），写死一个 vX.Y.Z 就是第二处必腐副本。
+  //     允许 shields.io 行（那是动态端点，不含字面版本）。
+  const readmeFile = path.join(ROOT, 'README.md');
+  if (fs.existsSync(readmeFile)) {
+    const hits = [];
+    let inFence = false;
+    for (const line of fs.readFileSync(readmeFile, 'utf8').split(/\r?\n/)) {
+      // ★ 代码块里的版本字样是**示例**（如 `git commit -m "chore(release): v0.3.0"`），不是声明
+      if (/^\s*```/.test(line)) { inFence = !inFence; continue; }
+      if (inFence) continue;
+      if (/img\.shields\.io/.test(line)) continue;
+      const m = line.match(/\bv\d+\.\d+\.\d+\b/);
+      if (m) hits.push(`${m[0]}（${line.trim().slice(0, 50)}…）`);
+    }
+    if (hits.length) {
+      errors.push(`README 硬编码了版本号：${hits.join(' / ')} —— ★ 用动态徽章（写死的必腐）`);
+    }
+  }
+
+  // 3c) 嵌套 package.json（`X-0053` S-6）—— 有几份就核几份，未对齐即红
+  const nested = findNestedPackageJsons(ROOT, 0);
+  for (const f of nested) {
+    try {
+      const v = JSON.parse(fs.readFileSync(f, 'utf8')).version;
+      if (version && v !== version) {
+        errors.push(`嵌套 ${path.relative(ROOT, f)} 的 version（${v}）与 VERSION（${version}）不一致`);
+      }
+    } catch (e) {
+      warnings.push(`嵌套 ${path.relative(ROOT, f)} 解析失败：${e.message}`);
+    }
   }
 
   // 4) git 基线：上个版本之后有没有「没记录的改动」

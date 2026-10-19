@@ -484,7 +484,7 @@ balance_after / balance_source   -- 余额来源：主账号 / 子账号 / CLI O
 | Unreal（备选实现 ChiR24） | 8091 | WS，仅该实现启用时占用 |
 | Unreal（备选实现 aadeshrao123） | 55557 | TCP，仅该实现启用时占用 |
 | **Unreal 官方 MCP（预留）** | **8000** | HTTP，UE 5.8+ 内置（ADR-0007）。**已登记但未启用**；属通用端口，启用前必须探测占用 |
-| **Unity MCP（预留）** | 8080 | **延后，当前不占用**（ADR-0004） |
+| **Unity MCP（预留）** | 8090 | **延后，当前不占用**（ADR-0004；★ 8080 自 2026-10-18 起属 `qiuyuan-game-ws`） |
 | gbe-assets API | 8788 | 见 assets 方案 |
 | gbe-assets Web | 8789 | 见 assets 方案 |
 

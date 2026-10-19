@@ -57,7 +57,7 @@
       "ports": ["unity-mcp"],
       "requires": [],
       "axis": { "unit_scale": 1, "horizontal_rotation_deg": 180, "up_axis_handled_by": "engine-importer" },
-      "deferred_reason": "ADR-0004：当前无在用工程，Phase 1/2 不排期。契约字段（asset.json.engines.unity）与端口 8080 已保留。",
+      "deferred_reason": "ADR-0004：当前无在用工程，Phase 1/2 不排期。契约字段（asset.json.engines.unity）与端口已保留（`unity-mcp` = 8090 —— ★ 8080 自 2026-10-18 起属 `qiuyuan-game-ws`，见 gbe-assets/catalog/ports.json）。",
       "behavior_when_requested": "error",
       "error_message": "引擎未启用：unity（ADR-0004，延后）。契约与端口已保留，需要时补 engines/unity/ 适配器即可。"
     }
