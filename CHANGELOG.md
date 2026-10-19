@@ -19,6 +19,15 @@
 
 ## [未发布]
 
+## [0.6.8] - 2026-10-19
+
+### 修错
+- **CI 第二轮红**：`GBE_ASSETS_REPO` 此前只挂在 `sync-ports.js --check` 那一步上（`env:` 级），
+  v0.6.6 新补的 `procedural.smoke` / `schema-ref.smoke` 在 `npm test` 里读不到 gbe-assets
+  ⇒ 以 **2** 退出（"跳过 · NOT a pass"）⇒ `npm test` 红。
+  ★ 判据：**跨仓依赖要挂在 job 级**，不能只给"某一步"——★ 否则同一份环境在第二个消费者那里就消失了。
+  ★ 本地复现：把 `GBE_ASSETS_REPO` 指向另一份克隆，`npm test` 4 套全绿。
+
 ## [0.6.7] - 2026-10-19
 
 ### 修错

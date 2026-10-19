@@ -15,6 +15,11 @@ jobs:
     strategy:
       matrix:
         node-version: [20, 22]
+    # ★ 2026-10-19（v0.6.8）：**整个 job 都要能看见 gbe-assets**，不只是 sync-ports 那一步。
+    #   新补的两套测试（procedural / schema-ref）都要读它：kit.budgets 与 @gbe/schema 单源。
+    #   此前只给 sync-ports 单独 env ⇒ `npm test` 里那两套找不到仓、以 2 退出（NOT a pass）⇒ CI 红。
+    env:
+      GBE_ASSETS_REPO: ${{ github.workspace }}/gbe-assets
     steps:
       - uses: actions/checkout@v4
         with:
