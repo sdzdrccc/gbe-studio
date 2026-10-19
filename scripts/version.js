@@ -294,6 +294,11 @@ function findNestedPackageJsons(dir, depth) {
   for (const e of entries) {
     if (!e.isDirectory() || SKIP_DIRS.has(e.name)) continue;
     const full = path.join(dir, e.name);
+    // ★ 2026-10-19（v0.6.7）：**别的仓库不算"我们的嵌套包"**。
+    //   CI 把 gbe-assets checkout 到工作区内（`.github/workflows/ci.yml`），它的
+    //   `packages/schema/package.json`（库版本 0.1.0）会被当成镜像检查 ⇒ 误红。
+    //   判据：目录里有 `.git` 就是另一个仓（`.git` 可能是目录，也可能是 worktree 的文件）。
+    if (fs.existsSync(path.join(full, '.git'))) continue;
     const pkg = path.join(full, 'package.json');
     if (fs.existsSync(pkg)) out.push(pkg);
     out.push(...findNestedPackageJsons(full, depth + 1));

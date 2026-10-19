@@ -19,6 +19,15 @@
 
 ## [未发布]
 
+## [0.6.7] - 2026-10-19
+
+### 修错
+- **CI 误红（v0.6.6 的回归）**：`version.js check` 新加的「嵌套 `package.json` 版本对齐」把
+  **工作区内 checkout 的 `gbe-assets`**（`packages/schema/package.json` = 库版本 `0.1.0`）当成了本仓镜像
+  ⇒ GH Actions 上 `version.js check` 必红、后两步全 skipped。
+  ★ 判据修正：**目录里有 `.git` = 另一个仓库，不是"我们的嵌套包"**（`.git` 可能是目录或 worktree 文件）。
+  ★ 本地复现：在克隆里造一个带 `.git` 的 `gbe-assets/packages/schema/package.json` → 修复前红、修复后绿。
+
 ## [0.6.6] - 2026-10-19
 
 ### 修错
