@@ -3,10 +3,9 @@
 /**
  * components.js —— 程序化构件的定义（BUILDING-DECOMPOSITION §9.2 中标记为 P 的全部）
  *
- * 这 24 件是整套构件化方案里**性价比最高的一笔**：0 credit、确定性可重建、
- * 不依赖任何平台与网络。它们撑起了承重链的下半截（台基 → 柱础 → 柱 → 枋 → 梁 → 屋面）
- * 与围护的骨架（阶条石 / 墙段 / 转角墙 / 栏杆），外加民居六件灰模
- * （硬山屋面 / 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗）。
+ * 这 40 件是整套资产线里**性价比最高的一笔**：0 credit、确定性可重建、
+ * 不依赖任何平台与网络。其中 24 件是建筑构件（承重链 / 围护 / 民居六件灰模），
+ * 16 件是村落皮肤与道具（地面 / 老槐 / 山石 / 草木 / 街具 / 家具 / 法器 / 照明）。
  *
  * ── 三条硬纪律（写在定义里，也由 generate.js 逐件复验）──
  *  ① 插槽位置**必须落 snap_m = 0.5 m 定位网格**（attach 类除外）。定位一松，跨批次拼装就散了。
@@ -25,7 +24,7 @@ const { addBox, addCylinder, addDome, addExtrude, addSweptBeam, troughProfile } 
 const V = '1.0.0';
 const LIC = 'CC0-1.0';
 
-// ── 插槽工厂（把 mate_types 的约定收在一处，免得 24 件各写一遍写岔）─────────────
+// ── 插槽工厂（把 mate_types 的约定收在一处，免得 40 件各写一遍写岔）─────────────
 const MATE = {
   foot: ['stack-up', 'roof-seat'], // 底面：坐在别人的顶面上
   top: ['ground-foot'], // 顶面：接住别人的底面
@@ -883,6 +882,391 @@ const components = [
     build(M) {
       addCylinder(M, { r1: 0.125, r2: 0.125, h: 0.04, seg: 16, at: [0, 0, 0], slot: 'ornament' });
       addDome(M, { r: 0.125, h: 0.06, seg: 16, rings: 3, at: [0, 0.04, 0], slot: 'ornament' });
+    },
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 地面 terrain/ground-tile（2026-10-22 村落皮肤第一批）
+  // ═════════════════════════════════════════════════════════════════════════
+
+  {
+    name: 'dirt-a',
+    title: '地面·土（2 m 块）',
+    category: 'terrain/ground-tile',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['terrain', 'ground', 'dirt', '程序化'],
+    summary: '2 × 2 m 土面块，厚 0.1 m，底在 y=0。沿 X / Z 各留一个 continue 插槽，步距 2 m，可直接铺成片。',
+    collision: 'box',
+    slots: [{ slot: 'ground', ref: 'earth/hang-tu' }],
+    sockets: [
+      sock.foot([0, 0, 0], '地面基准'),
+      sock.run([1, 0, 0], '+x', 2.0, '沿 X 铺块'),
+      sock.run([0, 0, 1], '+z', 2.0, '沿 Z 铺块'),
+    ],
+    build(M) {
+      addBox(M, { size: [2.0, 0.1, 2.0], at: [0, 0.05, 0], slot: 'ground' });
+    },
+  },
+
+  {
+    name: 'grass-a',
+    title: '地面·草（2 m 块）',
+    category: 'terrain/ground-tile',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['terrain', 'ground', 'grass', '程序化'],
+    summary: '2 × 2 m 草面块，厚 0.1 m。与土块同模数、同插槽，只换材质。',
+    collision: 'box',
+    slots: [{ slot: 'ground', ref: 'plant/cao-lv' }],
+    sockets: [
+      sock.foot([0, 0, 0], '地面基准'),
+      sock.run([1, 0, 0], '+x', 2.0, '沿 X 铺块'),
+      sock.run([0, 0, 1], '+z', 2.0, '沿 Z 铺块'),
+    ],
+    build(M) {
+      addBox(M, { size: [2.0, 0.1, 2.0], at: [0, 0.05, 0], slot: 'ground' });
+    },
+  },
+
+  {
+    name: 'road-a',
+    title: '地面·土路（2 m 块）',
+    category: 'terrain/ground-tile',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['terrain', 'ground', 'road', '程序化'],
+    summary: '2 × 2 m 土路块，厚 0.1 m；用青砖色与土/草区分。铺村道时按行铺即可。',
+    collision: 'box',
+    slots: [{ slot: 'ground', ref: 'earth/qing-zhuan' }],
+    sockets: [
+      sock.foot([0, 0, 0], '地面基准'),
+      sock.run([1, 0, 0], '+x', 2.0, '沿 X 铺块'),
+      sock.run([0, 0, 1], '+z', 2.0, '沿 Z 铺块'),
+    ],
+    build(M) {
+      addBox(M, { size: [2.0, 0.1, 2.0], at: [0, 0.05, 0], slot: 'ground' });
+    },
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 植被 nature/tree · nature/rock · nature/plant
+  // ═════════════════════════════════════════════════════════════════════════
+
+  {
+    name: 'old-locust-a',
+    title: '村口老槐（灰模）',
+    category: 'nature/tree',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['nature', 'tree', 'locust', '程序化', '灰模'],
+    summary:
+      '村口老槐：4 m 主干（下粗上细）＋ 4 根斜枝 ＋ 5 团树冠，冠幅约 4 × 4 m、总高约 5.8 m。' +
+      '按设定「不知年岁的老槐」做灰模，枝叶用半球团，不追求最终树形。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'timber/ben-se' },
+      { slot: 'ornament', ref: 'plant/ye-lu' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '树根落地')],
+    build(M) {
+      // 根部土台，压住树脚
+      addBox(M, { size: [1.5, 0.2, 1.5], at: [0, 0.1, 0], slot: 'trim' });
+      // 主干：下粗上细
+      addCylinder(M, { r1: 0.55, r2: 0.35, h: 4.0, seg: 9, at: [0, 0, 0], slot: 'trim' });
+      // 四根斜枝
+      addCylinder(M, { r1: 0.18, r2: 0.08, h: 2.0, seg: 7, at: [0.2, 3.4, 0], rot: [0, 0, -0.5], slot: 'trim' });
+      addCylinder(M, { r1: 0.18, r2: 0.08, h: 2.0, seg: 7, at: [-0.2, 3.4, 0], rot: [0, 0, 0.5], slot: 'trim' });
+      addCylinder(M, { r1: 0.16, r2: 0.07, h: 1.8, seg: 7, at: [0, 3.3, 0.2], rot: [0.5, 0, 0], slot: 'trim' });
+      addCylinder(M, { r1: 0.16, r2: 0.07, h: 1.8, seg: 7, at: [0, 3.3, -0.2], rot: [-0.5, 0, 0], slot: 'trim' });
+      // 树冠：单个大冠，冠幅 4 × 4 m。
+      // 不叠小半球 —— 两团相交处会露出内壁，俯视时是一块块黑洞；
+      // 灰模阶段宁可要一个干净的整冠，等真树模型再补枝冠层次。
+      addDome(M, { r: 2.0, h: 1.4, seg: 12, rings: 3, at: [0, 4.2, 0], slot: 'ornament' });
+      // 半球顶的扇形收口在软件光栅里会露一圈内壁；加一块小圆盖封顶。
+      addCylinder(M, { r1: 1.05, r2: 1.05, h: 0.25, seg: 12, at: [0, 5.4, 0], slot: 'ornament' });
+    },
+  },
+
+  {
+    name: 'rock-a',
+    title: '山石·大（灰模）',
+    category: 'nature/rock',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['nature', 'rock', 'stone', '程序化', '灰模'],
+    summary: '大块山石：六棱石身 + 石顶，约 2.0 × 1.2 × 2.0 m。用低段数换棱角感，不做噪声起伏。',
+    collision: 'box',
+    slots: [{ slot: 'base', ref: 'stone/qing-shi' }],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addCylinder(M, { r1: 1.0, r2: 0.65, h: 0.8, seg: 8, at: [0, 0, 0], slot: 'base' });
+      addDome(M, { r: 0.8, h: 0.4, seg: 8, rings: 2, at: [0, 0.8, 0], slot: 'base' });
+    },
+  },
+
+  {
+    name: 'rock-b',
+    title: '山石·小（灰模）',
+    category: 'nature/rock',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['nature', 'rock', 'stone', '程序化', '灰模'],
+    summary: '小块山石：约 1.25 × 0.8 × 1.25 m，白石色；与大石同配方不同参数。',
+    collision: 'box',
+    slots: [{ slot: 'base', ref: 'stone/bai-shi' }],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addCylinder(M, { r1: 0.625, r2: 0.4, h: 0.5, seg: 8, at: [0, 0, 0], slot: 'base' });
+      addDome(M, { r: 0.5, h: 0.3, seg: 8, rings: 2, at: [0, 0.5, 0], slot: 'base' });
+    },
+  },
+
+  {
+    name: 'grass-tuft-a',
+    title: '草丛（灰模）',
+    category: 'nature/plant',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['nature', 'plant', 'grass', '程序化', '灰模'],
+    summary: '一丛草：0.75 × 0.65 × 0.75 m，7 片斜叶 + 土色底座。沿村路与墙根撒，成本 0。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'earth/hang-tu' },
+      { slot: 'ornament', ref: 'plant/cao-lv' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addBox(M, { size: [0.75, 0.05, 0.75], at: [0, 0.025, 0], slot: 'trim' });
+      const blades = [
+        [-0.2, 0, 0, 0.25],
+        [0.2, 0, 0, -0.25],
+        [0, -0.2, 0.25, 0],
+        [0, 0.2, -0.25, 0],
+        [-0.1, -0.1, 0.15, 0.15],
+        [0.1, 0.1, -0.15, -0.15],
+        [0, 0, 0, 0],
+      ];
+      for (const [x, z, rx, rz] of blades) {
+        addBox(M, { size: [0.05, 0.6, 0.05], at: [x, 0.35, z], rot: [rx, 0, rz], slot: 'ornament' });
+      }
+    },
+  },
+
+  {
+    name: 'herb-a',
+    title: '药草（灰模）',
+    category: 'nature/plant',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['nature', 'plant', 'herb', '程序化', '灰模'],
+    summary: '一株药草：0.75 × 0.8 × 0.75 m，三茎 + 四片叶 + 土色底座。给药圃与屋角用。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'earth/hang-tu' },
+      { slot: 'ornament', ref: 'plant/ye-lu' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addBox(M, { size: [0.75, 0.05, 0.75], at: [0, 0.025, 0], slot: 'trim' });
+      addBox(M, { size: [0.05, 0.7, 0.05], at: [-0.15, 0.4, 0], rot: [0, 0, 0.15], slot: 'ornament' });
+      addBox(M, { size: [0.05, 0.8, 0.05], at: [0, 0.45, 0], slot: 'ornament' });
+      addBox(M, { size: [0.05, 0.65, 0.05], at: [0.15, 0.375, 0], rot: [0, 0, -0.15], slot: 'ornament' });
+      addBox(M, { size: [0.22, 0.06, 0.12], at: [-0.1, 0.45, 0.08], rot: [0, 0.5, 0.2], slot: 'ornament' });
+      addBox(M, { size: [0.22, 0.06, 0.12], at: [0.1, 0.55, -0.08], rot: [0, -0.5, -0.2], slot: 'ornament' });
+      addBox(M, { size: [0.18, 0.05, 0.1], at: [0.12, 0.35, 0.1], rot: [0, 0.7, 0], slot: 'ornament' });
+      addBox(M, { size: [0.18, 0.05, 0.1], at: [-0.12, 0.3, -0.1], rot: [0, -0.7, 0], slot: 'ornament' });
+    },
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 生活道具 props/*（2026-10-22 村落皮肤第二批）
+  // ═════════════════════════════════════════════════════════════════════════
+
+  {
+    name: 'woodpile-a',
+    title: '柴堆（灰模）',
+    category: 'props/street',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'street', 'woodpile', 'firewood', '程序化'],
+    summary: '六根圆木堆成的小柴堆：1.5 × 0.75 × 1.25 m。三底、两中、一顶，给村屋墙根与灶房用。',
+    collision: 'box',
+    slots: [{ slot: 'trim', ref: 'timber/ben-se' }],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      const log = (x, y, z) => addCylinder(M, { r1: 0.125, r2: 0.125, h: 1.5, seg: 8, at: [x, y, z], rot: [0, 0, -Math.PI / 2], slot: 'trim' });
+      log(-0.75, 0.125, -0.5);
+      log(-0.75, 0.125, 0);
+      log(-0.75, 0.125, 0.5);
+      log(-0.75, 0.375, -0.25);
+      log(-0.75, 0.375, 0.25);
+      log(-0.75, 0.625, 0);
+    },
+  },
+
+  {
+    name: 'drying-rack-a',
+    title: '晒架（灰模）',
+    category: 'props/street',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'street', 'rack', 'drying', '程序化'],
+    summary: '两柱两横杆的晒架：2.0 × 2.0 × 0.25 m，中间加一层竹席。晒药、晒谷、晒衣都可用。',
+    collision: 'box',
+    slots: [{ slot: 'trim', ref: 'timber/ben-se' }],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addBox(M, { size: [0.25, 2.0, 0.25], at: [-0.875, 1.0, 0], slot: 'trim' });
+      addBox(M, { size: [0.25, 2.0, 0.25], at: [0.875, 1.0, 0], slot: 'trim' });
+      addBox(M, { size: [2.0, 0.15, 0.25], at: [0, 1.9, 0], slot: 'trim' });
+      addBox(M, { size: [2.0, 0.15, 0.25], at: [0, 1.0, 0], slot: 'trim' });
+      addBox(M, { size: [1.75, 0.05, 0.25], at: [0, 1.08, 0], slot: 'trim' });
+    },
+  },
+
+  {
+    name: 'fence-a',
+    title: '篱笆（2 m 段）',
+    category: 'props/street',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'street', 'fence', '程序化'],
+    summary: '五桩两横的木篱笆：2.0 × 1.0 × 0.25 m，留 continue 插槽，步距 2 m 可连成长院墙。',
+    collision: 'box',
+    slots: [{ slot: 'trim', ref: 'timber/ben-se' }],
+    sockets: [
+      sock.foot([0, 0, 0], '落地'),
+      sock.run([1.0, 0, 0], '+x', 2.0, '沿院墙续接'),
+    ],
+    build(M) {
+      for (const x of [-0.8, -0.4, 0, 0.4, 0.8]) {
+        addBox(M, { size: [0.25, 1.0, 0.25], at: [x, 0.5, 0], slot: 'trim' });
+      }
+      addBox(M, { size: [2.0, 0.12, 0.25], at: [0, 0.3, 0], slot: 'trim' });
+      addBox(M, { size: [2.0, 0.12, 0.25], at: [0, 0.7, 0], slot: 'trim' });
+    },
+  },
+
+  {
+    name: 'stone-mill-a',
+    title: '石碾（灰模）',
+    category: 'props/street',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'street', 'mill', 'stone', '程序化'],
+    summary: '圆盘石碾：盘径 1.5 m、中柱 + 横辊 + 木推杆。给村口或场院用，是“以农为生”的可见道具。',
+    collision: 'box',
+    slots: [
+      { slot: 'base', ref: 'stone/qing-shi' },
+      { slot: 'trim', ref: 'timber/ben-se' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addCylinder(M, { r1: 0.75, r2: 0.75, h: 0.2, seg: 12, at: [0, 0, 0], slot: 'base' });
+      addCylinder(M, { r1: 0.1, r2: 0.1, h: 0.8, seg: 8, at: [0, 0.2, 0], slot: 'trim' });
+      addCylinder(M, { r1: 0.3, r2: 0.3, h: 0.6, seg: 10, at: [-0.3, 0.5, 0], rot: [0, 0, -Math.PI / 2], slot: 'base' });
+      addBox(M, { size: [1.2, 0.08, 0.08], at: [0, 0.8, 0], slot: 'trim' });
+    },
+  },
+
+  {
+    name: 'herb-basket-a',
+    title: '药篓（灰模）',
+    category: 'props/furniture',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'furniture', 'basket', 'herb', '程序化'],
+    summary: '敞口药篓：1.0 × 0.7 × 1.0 m，上宽下窄 + 弓形提手。给药圃、屋角与采药人用。',
+    collision: 'box',
+    slots: [{ slot: 'trim', ref: 'timber/ben-se' }],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addCylinder(M, { r1: 0.4, r2: 0.5, h: 0.45, seg: 12, at: [0, 0, 0], slot: 'trim', capTop: false });
+      addBox(M, { size: [0.06, 0.3, 0.06], at: [-0.32, 0.55, 0], slot: 'trim' });
+      addBox(M, { size: [0.06, 0.3, 0.06], at: [0.32, 0.55, 0], slot: 'trim' });
+      addBox(M, { size: [0.7, 0.06, 0.06], at: [0, 0.7, 0], slot: 'trim' });
+    },
+  },
+
+  {
+    name: 'farm-tools-a',
+    title: '农具（灰模）',
+    category: 'props/furniture',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'furniture', 'tools', 'farm', '程序化'],
+    summary: '木架上一把锄头 + 一把镰刀：1.0 × 1.2 × 0.5 m。锄刃与镰刃用铁色，木柄本色。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'timber/ben-se' },
+      { slot: 'ornament', ref: 'metal/tie-hei' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addBox(M, { size: [1.0, 0.05, 0.5], at: [0, 0.025, 0], slot: 'trim' });
+      addBox(M, { size: [0.08, 1.1, 0.08], at: [-0.2, 0.6, 0], rot: [0, 0, 0.15], slot: 'trim' });
+      addBox(M, { size: [0.28, 0.15, 0.06], at: [-0.32, 0.15, 0.1], rot: [0, 0, 0.15], slot: 'ornament' });
+      addBox(M, { size: [0.06, 0.9, 0.06], at: [0.22, 0.5, -0.1], rot: [0, 0, -0.1], slot: 'trim' });
+      addBox(M, { size: [0.22, 0.05, 0.08], at: [0.32, 0.9, -0.1], rot: [0, 0, 0.4], slot: 'ornament' });
+    },
+  },
+
+  {
+    name: 'spirit-plate-a',
+    title: '八系测灵盘（灰模）',
+    category: 'props/ritual',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'ritual', 'spirit-root', 'plate', '程序化'],
+    summary:
+      '开场演出用的八系测灵盘：1.25 × 0.86 × 1.25 m，木座 + 铜盘 + 八道放射刻线。' +
+      '刻线只做方向示意，真正的灵根判定仍在服务端（本件是道具，不是 UI）。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'timber/ben-se' },
+      { slot: 'base', ref: 'metal/tong-liu-jin' },
+      { slot: 'ornament', ref: 'metal/tie-hei' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addCylinder(M, { r1: 0.4, r2: 0.4, h: 0.15, seg: 12, at: [0, 0, 0], slot: 'trim' });
+      addCylinder(M, { r1: 0.08, r2: 0.08, h: 0.6, seg: 8, at: [0, 0.15, 0], slot: 'trim' });
+      addCylinder(M, { r1: 0.625, r2: 0.625, h: 0.08, seg: 16, at: [0, 0.75, 0], slot: 'base' });
+      for (let i = 0; i < 8; i++) {
+        const a = (i * Math.PI) / 4;
+        addBox(M, {
+          size: [0.25, 0.03, 0.06],
+          at: [Math.cos(a) * 0.35, 0.83, Math.sin(a) * 0.35],
+          rot: [0, a, 0],
+          slot: 'ornament',
+        });
+      }
+    },
+  },
+
+  {
+    name: 'lantern-a',
+    title: '灯笼杆（灰模）',
+    category: 'props/lighting',
+    tier: 'primitive',
+    granularity: 'L1',
+    tags: ['props', 'lighting', 'lantern', '程序化'],
+    summary: '村口/院门灯笼杆：0.75 × 2.2 × 0.5 m，木杆 + 横臂 + 红纸灯笼。夜里给一点人气。',
+    collision: 'box',
+    slots: [
+      { slot: 'trim', ref: 'timber/ben-se' },
+      { slot: 'ornament', ref: 'textile/zhu-lian' },
+      { slot: 'base', ref: 'metal/tie-hei' },
+    ],
+    sockets: [sock.foot([0, 0, 0], '落地')],
+    build(M) {
+      addBox(M, { size: [0.75, 0.1, 0.5], at: [0, 0.05, 0], slot: 'trim' });
+      addBox(M, { size: [0.15, 2.2, 0.15], at: [-0.2, 1.1, 0], slot: 'trim' });
+      addBox(M, { size: [0.6, 0.1, 0.1], at: [-0.025, 2.1, 0], slot: 'trim' });
+      addCylinder(M, { r1: 0.22, r2: 0.22, h: 0.4, seg: 12, at: [0.125, 1.65, 0], slot: 'ornament' });
+      addCylinder(M, { r1: 0.25, r2: 0.25, h: 0.05, seg: 12, at: [0.125, 2.05, 0], slot: 'base' });
+      addCylinder(M, { r1: 0.25, r2: 0.25, h: 0.05, seg: 12, at: [0.125, 1.6, 0], slot: 'base' });
     },
   },
 ];

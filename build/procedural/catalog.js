@@ -4,7 +4,7 @@
  * catalog.js —— 生成「程序化构件总览」单页（自包含 HTML，预览图 base64 内嵌）
  *
  * 为什么要有这一页：程序化构件的验收不能只看控制台里的三角数与插槽数。
- * 「长成什么样」是美术判断，只能看图 —— 一页看全 18 件，比翻 18 个目录快。
+ * 「长成什么样」是美术判断，只能看图 —— 一页看全 primitive 层（当前 34 件），比翻目录快。
  *
  * 数据来源：**已入库的实体**（`gbe-assets/kits/`），不是生成器内存里的定义。
  * 输出：`build/out/procedural-catalog.html`（`build/out/` 随 .gitignore 忽略 —— 派生件可重建）
@@ -24,11 +24,37 @@ const GROUP_LABEL = {
   pillar: '柱网',
   beam: '梁架',
   wall: '屋身',
+  'door-window': '门窗',
   roof: '屋顶',
   railing: '栏杆',
   ornament: '装饰',
+  'ground-tile': '地面',
+  tree: '树木',
+  rock: '山石',
+  plant: '草木',
+  street: '街具',
+  furniture: '家具',
+  ritual: '法器',
+  lighting: '照明',
 };
-const GROUP_ORDER = ['base', 'pillar', 'beam', 'wall', 'roof', 'railing', 'ornament'];
+const GROUP_ORDER = [
+  'base',
+  'pillar',
+  'beam',
+  'wall',
+  'door-window',
+  'roof',
+  'railing',
+  'ornament',
+  'ground-tile',
+  'tree',
+  'rock',
+  'plant',
+  'street',
+  'furniture',
+  'ritual',
+  'lighting',
+];
 
 function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

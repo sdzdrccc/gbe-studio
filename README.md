@@ -97,7 +97,7 @@ gbe-studio/
 │   │   ├── gltf.js              glTF 2.0 binary 写出 + 回读自检（accessor / material / 对齐）
 │   │   ├── render.js            纯 JS 软件光栅化预览（512×512 白底 3/4 视角 · 三点布光 · 投影阴影 · 手写 PNG）
 │   │   ├── material-colors.json 占位配色真源（引用本表的资产一律带 needs-material-review）
-│   │   ├── components.js        ★ 24 件程序化构件定义（18 primitive ＋ 民居六件灰模 · §9.2 标 P 的全部）
+│   │   ├── components.js        ★ 40 件程序化资产定义（24 建筑构件 ＋ 16 村落皮肤/道具）
 │   │   ├── generate.js          生成器：几何 → 逐件自检 → 打包含盘 → 投递 inbox（--check / --only / --ss）
 │   │   ├── assemble.js          装配清单生成：按「谁插谁」求解坐标（不硬编码）→ §19.5 首跑 → 落 `assemblies/`
 │   │   ├── verify.js            出包复验（调 gbe-assets 的 @gbe/schema 真源校验器，门禁双跑的第二次）
