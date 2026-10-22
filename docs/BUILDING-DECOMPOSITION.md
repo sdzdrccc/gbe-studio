@@ -38,9 +38,9 @@
 
 | 阶段 | 逐栋生成 | 构件化 |
 |---|---|---|
-| 建库期（50 类构件 = 18 P + 27 A + 5 B · 含 3 类整栋拆分） | — | 27 × 30 + 3 × 55 = **975 credit**（18 件程序化件 0 成本；5 件 B 件是拆分产物，不另付生成费） |
+| 建库期（50 类构件 = 24 P + 21 A + 5 B · 含 3 类整栋拆分） | — | 21 × 30 + 3 × 55 = **795 credit**（24 件程序化件 0 成本；5 件 B 件是拆分产物，不另付生成费） |
 | 每栋新建 | ≈ 55 credit | = **全新型**构件数 × 30 credit（口径见 §10.5） |
-| 第 1–10 栋累计 | 550 | 975 + 10×150 = **2475** |
+| 第 1–10 栋累计 | 550 | 795 + 10×150 = **2295** |
 | 第 11–28 栋累计 | 1540 | 2475 + 18×**N差**×30 |
 
 > ⚠️ **这张表还没证明构件化更便宜，别把它当已结的账。** 按本表口径，即使 `N差` 在第 10 栋后就归零，构件化建库 + 前 10 栋已经 **2475**，而逐栋铺满 28 栋只要 **1540**——**单看 AI 调用费，28 栋内回不了本**。
@@ -395,7 +395,7 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 4 | `cn-ancient.base.plinth-fupen-a` | 柱础·覆盆式 | L2 | primitive | **P** | 0.6k | `ground-foot`(-y) · `stack-up`(+y) |
 | 5 | `cn-ancient.base.plinth-lotus-a` | 柱础·莲瓣式 | L2 | primitive | **P** | 1.0k | `ground-foot`(-y) · `stack-up`(+y) |
 | | **柱网 `pillar/`** | | | | | | |
-| 6 | `cn-ancient.pillar.yanzhu-round-a` | 檐柱（圆柱） | L2 | component | A | 1.5k | `ground-foot` · `stack-up` |
+| 6 | `cn-ancient.pillar.yanzhu-round-a` | 檐柱（圆柱） | L2 | component | **P** | 1.5k | `ground-foot` · `stack-up` |
 | 7 | `cn-ancient.pillar.jinzhu-round-a` | 金柱（圆柱） | L2 | component | **B** | 1.5k | `ground-foot` · `stack-up` |
 | 8 | `cn-ancient.pillar.corner-round-a` | 角柱 | L2 | component | A | 1.8k | `ground-foot` · `stack-up` |
 | 9 | `cn-ancient.pillar.guazhu-a` | 瓜柱 | L2 | primitive | **P** | 0.4k | `stack-up` ×2 |
@@ -412,11 +412,11 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | | **屋身 `wall/` · `door-window/`** | | | | | | |
 | 18 | `cn-ancient.wall.qiang-straight-a` | 直墙段（2 m 模数） | L2 | primitive | **P** | 0.8k | `wall-line`(±x) |
 | 19 | `cn-ancient.wall.qiang-corner-a` | 转角墙墩（枢轴式） | L2 | primitive | **P** | 0.6k | `wall-line` ×4（落轴心） |
-| 20 | `cn-ancient.wall.shanqiang-a` | 山墙（歇山三角） | L2 | component | A | 2.5k | `wall-line` · `roof-seat` |
-| 21 | `cn-ancient.door-window.door-panel-double-a` | 双扇板门 | L2 | component | A | 2.0k | `wall-line` |
+| 20 | `cn-ancient.wall.shanqiang-a` | 山墙（硬山 · 7 m 段） | L2 | component | **P** | 2.5k | `wall-line` · `roof-seat` |
+| 21 | `cn-ancient.door-window.door-panel-double-a` | 双扇板门 | L2 | component | **P** | 2.0k | `wall-line` |
 | 22 | `cn-ancient.door-window.door-geshan-a` | 格扇门 | L2 | mass | A | 3.5k | `wall-line` |
 | 23 | `cn-ancient.door-window.window-linghua-a` | 菱花窗 | L2 | mass | A | 3.0k | `wall-line` |
-| 24 | `cn-ancient.door-window.window-fan-lattice-a` | 扇形格扇窗 | L2 | mass | A | 3.0k | `wall-line` |
+| 24 | `cn-ancient.door-window.window-fan-lattice-a` | 扇形格扇窗 | L2 | mass | **P** | 3.0k | `wall-line` |
 | | **屋顶 `roof/`** | | | | | | |
 | 25 | `cn-ancient.roof.xieshan-single-a` | 歇山单檐（整体） | L1 | mass | A | 12k | `roof-seat` · `ridge-point` |
 | 26 | `cn-ancient.roof.xieshan-lower-eave-a` | 歇山下檐（重檐用） | L1 | mass | **B** | 14k | `roof-seat` |
@@ -426,13 +426,13 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 30 | `cn-ancient.roof.eave-rafter-a` | 檐椽 | L2 | primitive | **P** | 0.3k | `continue` |
 | 31 | `cn-ancient.roof.flying-rafter-a` | 飞椽 | L2 | primitive | **P** | 0.3k | `continue` |
 | 32 | `cn-ancient.roof.purlin-round-a` | 檩条（圆檩） | L2 | primitive | **P** | 0.2k | `continue` |
-| 33 | `cn-ancient.roof.ridge-main-a` | 正脊 | L2 | component | A | 2.0k | `ridge-point` ×2 |
+| 33 | `cn-ancient.roof.ridge-main-a` | 正脊 | L2 | component | **P** | 2.0k | `ridge-point` ×2 |
 | 34 | `cn-ancient.roof.ridge-vertical-a` | 垂脊 | L2 | component | A | 1.8k | `ridge-point` |
 | 35 | `cn-ancient.roof.ridge-hip-a` | 戗脊 | L2 | component | A | 1.8k | `ridge-point` |
 | 36 | `cn-ancient.roof.ridge-tile-cylinder` | 脊筒 | L2 | primitive | **P** | 0.2k | `continue` |
 | 37 | `cn-ancient.roof.gable-board-a` | 博风板 | L2 | primitive | **P** | 0.4k | `attach` |
 | | **屋顶 `roof/` · 另四样式 + 庑殿（2026-10-11 由 `forms.js` 并入表内）** | | | | | | |
-| 38 | `cn-ancient.roof.yingshan-single-a` | 硬山单檐（整体） | L1 | mass | A | 9k ※ | `roof-seat` · `ridge-point` |
+| 38 | `cn-ancient.roof.yingshan-single-a` | 硬山单檐（整体） | L1 | mass | **P** | 9k ※ | `roof-seat` · `ridge-point` |
 | 39 | `cn-ancient.roof.xuanshan-single-a` | 悬山单檐（整体） | L1 | mass | A | 9k ※ | `roof-seat` · `ridge-point` |
 | 40 | `cn-ancient.roof.cuanjian-single-a` | 攒尖单檐（亭顶·含宝顶） | L1 | mass | A | 8k ※ | `roof-seat` · `ridge-point` |
 | 41 | `cn-ancient.roof.wudian-single-a` | 庑殿单檐（四阿顶） | L1 | mass | **B** | 11k ※ | `roof-seat` · `ridge-point` |
@@ -449,11 +449,12 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 50 | `cn-ancient.ornament.jishou-walk-a` | 走兽（脊兽组） | L3 | component | A | 2.0k | `attach` |
 
 > ※ 38–42 行的面数是**推定值**（参照同类 `xieshan-single-a` 的 12k，按形制复杂度取 8–11k），非实测；入库时以 `generate` / `intake` 实测为准。
+> ★ **第 6 / 20 / 21 / 24 / 33 / 38 行 2026-10-21 由 A 改 P**：民居六件（檐柱 / 山墙 / 双扇门 / 扇形窗 / 正脊 / 硬山屋面）先用程序化灰模（0 credit）入库；硬山屋面 + 正脊试装全绿。正式美术可在后续版本升级。
 > **命名以本表为准** = `forms.js` 的短名（攒尖是 `cuanjian`，不是 `zanjiang`），且 **`asset id 第三段 == 目录名 == 本表名称列的短名`**（`asset.v2.schema.json` 不变式）。
 > **`wudian-single-a` 为什么是 B**：见 §10.5(b) 的 hero 来源裁决 —— 只被 hero 形制（城门楼）消费、且尚未入库的件，走整栋拆分产物，不单开 AI 直生。
 > **`luding-single-a` 为什么仍是 A**：它服务牌坊（`tier: mass`，非 hero）；若牌坊按 §9.1 先走整栋拆分，该件可直接由拆分产物顶替，**这 30 credit 可省**。
 
-**路线分布**：程序化 **P = 18 件**（0 成本！）· 构件直生 **A = 27 件** · 整栋拆分产物 **B = 5 件**（18 + 27 + 5 = 50 ✓）。
+**路线分布**：程序化 **P = 24 件**（0 成本！★ 含 2026-10-21 灰模先行的民居六件：硬山屋顶 ＋ 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗）· 构件直生 **A = 21 件** · 整栋拆分产物 **B = 5 件**（24 + 21 + 5 = 50 ✓）。
 
 > **B 列为什么从 0 变成 5（2026-10-11 · 大人裁决）**：下一条勘误说「B 是**方法**、不是本表的构件条目，故 B 列恒为 0」——**方法层面仍然成立**（B 作用于 §9.1 的 3 类形制）。这次改的是**来源标注**：5 件**只被 hero 形制消费、且尚未入库**的构件（`jinzhu-round-a` / `xieshan-lower-eave-a` / `xieshan-upper-ridge-a` / `tile-field-cylinder` / `wudian-single-a`），按 §10.5(b) 的新判定**不许另开 AI 直生**，只能作为 hero 整栋拆分的产物入库。所以这些行的路线列写 **B**，意思是「**本件的入库来源 = 拆分产物**」，不是「本件是第三种东西」。**两条勘误不冲突：一条讲计数单位，一条讲入库来源。**
 >
@@ -474,12 +475,12 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 
 > **转角件为什么是「墩」而不是「L 形墙」（批 1 实施裁决）**：`qiang-corner-a` 与 `balustrade-corner-a` 原设计为 L 形整件，实现时发现它在「底面中心轴心 + 插槽落 0.5 m 定位网格」两条约束下**不可自洽**——翼厚 0.5 m 时两翼中心线在 ±0.25，永远落不到网格上。一般化的结论是：**L 形转角件的翼厚必须 ≥ 1.0 m**（`2·snap_m` 的整数倍），而 1 m 厚的转角墙在美术上不可接受。故两者实现为**枢轴式节点件**（角墩 / 望柱，插槽落轴心），L 形交给装配清单表达——这反而更贴合粒度判据 2「结构可分离」：**L 形是装配结果，不是构件**。详见 CONVENTIONS §19.5「节点件接法」。
 
-> **预算估算（2026-10-11 按 50 类重算）**：**27 × 30 + 3 × 55 = 975 credit** 建库。数字与订正前**相同，但构成完全不同**，别拿旧口径读它：
-> - `27` = 路线 A 的件数。旧口径的 27 是「45 类表里的 A 件」，**天生不含 5 件屋顶样式**；新口径的 27 = 50 类里的 A 件 = 旧 27 件**加** 4 件量产屋顶（硬山/悬山/攒尖/盝顶）**减** 4 件 hero 专属件（金柱/下檐/上层/筒瓦，改由 B 出）。
+> **预算估算（2026-10-11 按 50 类重算；2026-10-21 民居六件改 P 后更新）**：**21 × 30 + 3 × 55 = 795 credit** 建库。数字与改判前**不同**，别拿旧口径读它：
+> - `21` = 路线 A 的件数。硬山屋顶 ＋ 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗已于 2026-10-21 以程序化灰模先行（P · 0 credit）⇒ A 由 27 降到 21。
 > - `3 × 55` = 3 类走整栋拆分的形制（主殿 / 城门楼 / 牌坊）。**5 件 B 件的生成费已经含在这里**，不再另计——它们是从整栋拆分出来的产物，不是第三次调用。
-> - 旧口径其实是**少算了 4 件 × 30 = 120 credit**（漏掉的量产屋顶），又**多算了 4 件**（hero 件若另走直生）；两笔正好一负一正在 975 上打了平——**巧合，不是原来的账对**。
-> 对比逐栋生成 **28 栋 ≈ 1540 credit**——但**别只看这一行**：§1.2(a) 的口径下前 10 栋就停在 **2475**，仍高于逐栋 28 栋的 1540，回本靠的是复用带来的精修 / LOD / 材质免重做。见 §1.2 的警示框。
-> **省钱的真正来源是那 18 件程序化构件**——若它们也走 AI 直生，按 30 credit/件计需 **540 credit**；程序化把它们压到 0，且确定性可重建、不依赖平台与网络。
+> - 旧口径的 27 件 A 含 4 件量产屋顶（硬山/悬山/攒尖/盝顶）＋ 民居檐柱/门窗/山墙；六件改 P 后，A 只剩 3 件量产屋顶（悬山/攒尖/盝顶）与城邑/配殿件。
+> 对比逐栋生成 **28 栋 ≈ 1540 credit**——但**别只看这一行**：§1.2(a) 的口径下前 10 栋就停在 **2295**，仍高于逐栋 28 栋的 1540，回本靠的是复用带来的精修 / LOD / 材质免重做。见 §1.2 的警示框。
+> **省钱的真正来源是那 24 件程序化构件**——若它们也走 AI 直生，按 30 credit/件计需 **720 credit**；程序化把它们压到 0，且确定性可重建、不依赖平台与网络。
 
 ### 9.3 四批排期
 
@@ -489,9 +490,9 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 批次 | 目标 | 交付（计划） | **就绪态（实测）** | 验收点 |
 |---|---|---|---|---|
 | **批 0 · 契约与骨架** | 契约冻结 + 拆分脚本骨架 | schema（含 `granularity` / `assembly.v2`）、`decompose.py` 可跑通"按材质切分" | ✅ 契约已冻结（`CONVENTIONS` v1.4） | 一件测试模型能切出 ≥3 个可识别团块 ⚠️ **未验**：`decompose.py` 尚无实测团块记录 |
-| **批 1 · 单构件闭环** | 18 件程序化件 + **5 件屋顶样式件（A 路）**：歇山单檐本体 `xieshan-single-a` · 硬山 · 悬山 · 攒尖 · 盝顶 | 23 件入库，全部通过 QA Gate 与插槽校验（`wudian-single-a` 属 B 路，随批 4 城门楼拆分产出，**不在本批**） | **18 / 23**：程序化 18 件 ✅ 入库；屋顶样式件 ❌ **0 件生成** | **同一配方重复执行统计一致**（DoD §17.2）——程序化 18 件 ✅；屋顶件无从验起 |
+| **批 1 · 单构件闭环** | 24 件程序化件（含民居六件灰模）+ **4 件屋顶样式件（A 路）**：歇山单檐本体 `xieshan-single-a` · 悬山 · 攒尖 · 盝顶 | 28 件入库，全部通过 QA Gate 与插槽校验（`wudian-single-a` 属 B 路，随批 4 城门楼拆分产出，**不在本批**） | **24 / 28**：程序化 24 件 ✅ 入库；屋顶样式件 ❌ **0 / 4 件生成** | **同一配方重复执行统计一致**（DoD §17.2）——程序化 24 件 ✅；屋顶件无从验起 |
 | **批 2 · 单建筑闭环** | 配殿（歇山单檐）×2 | 1 份装配清单 + **18 件全新型构件补齐**（纸面预测值，见下表） | ❌ 未开始：配殿所需 18 件全新，**当前 0 件在手**（含 `xieshan-single-a` 屋顶本体） | **☆ 早检**（弱）：同形制第 2 栋的**全新型构件 = 0**（同型新尺寸变体可 >0）。只验"形制内纯引用成立"，**不足以判定方案成败**——终检在批 3（§10.5） |
-| **批 3 · 形制铺开** | 民居 / 商铺 / 廊 / 亭 / 牌坊 | 各形制模板 + 清单 | ❌ 未开始 | 复用比落在 3–15；建筑级 LOD 链可比。**验收点须可验**：每形制实际入库的**全新型件数 = 下表纸面预测值**（民居 3 / 商铺 1 / 廊 0 / 亭 3 / 牌坊 2）；**对不上即为拆分偏差**，按 §10.5(c) 重跑分析而不是改表 |
+| **批 3 · 形制铺开** | 民居 / 商铺 / 廊 / 亭 / 牌坊 | 各形制模板 + 清单 | 🟡 **民居首栋已装配**（`minju-hard-mountain-a` · 24 实例 / 8 构件 / 复用比 3.0）；其余形制未开始 | 复用比落在 3–15；建筑级 LOD 链可比。**验收点须可验**：每形制实际入库的**全新型件数 = 下表纸面预测值**（民居 3 / 商铺 1 / 廊 0 / 亭 3 / 牌坊 2）；**对不上即为拆分偏差**，按 §10.5(c) 重跑分析而不是改表 |
 | **批 4 · hero 与城邑** | 主殿 + 城门楼 + 铺排 | **北桢洲城邑**可运行场景（场景真源待 guild 定） | ❌ 未开始 · **前置已解除**：§10.5(b) 的 hero 判据已于 2026-10-11 裁定（卡来源不卡件数） | 端到端：生成 → 拆分 → 精修 → 入库 → 装配 → 导入 UE/Godot → 截图 |
 
 > **批 2 的验收点为什么必须重写**：原文写「1 份装配清单 + 缺失构件补齐」——**"补齐"没有目标值，验收就退化成"做完了"**。而批 2 恰恰是**第一次实测**：18 件全新型是纸面数，真造时因"额枋组要不要拆回额枋+平板枋"这类边界问题几乎必然偏离。偏离本身是**要采集的数据**（§10.5(c) 自陈的头号偏差），不是要掩盖的失败，所以判据必须写成可验的形式。
@@ -500,13 +501,14 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 
 | 项 | 状态 | 证据 |
 |---|---|---|
-| 18 件程序化构件生成 | ✅ | `gbe-studio/build/procedural/`（几何内核 / glTF 写出 / 软件光栅预览 / 18 件定义），0 credit |
-| 出包门禁 | ✅ 18/18 | `generate.js --check`：0 错误 · 1 软警告（`gable-board-a` 板厚 0.1 未落 0.25 造型网格——薄板天然如此，如实报比骗零警告诚实） |
-| 入库 | ✅ 18 件 | `gbe-assets/tools/intake.js` → `kits/cn-ancient/components/{base,wall,pillar,beam,roof,railing,ornament}/`，coverage `done` 由 0 刷到 18 |
+| 24 件程序化构件生成 | ✅ | `gbe-studio/build/procedural/`（几何内核 / glTF 写出 / 软件光栅预览 / 24 件定义，含民居六件灰模），0 credit |
+| 出包门禁 | ✅ 24/24 | `generate.js --check`：0 错误 · 软警告只剩 `gable-board-a` 板厚 0.1（薄板天然如此，如实报比骗零警告诚实） |
+| 入库 | ✅ 24 件 | `gbe-assets/tools/intake.js` → `kits/cn-ancient/components/{base,wall,pillar,beam,roof,railing,ornament,door-window}/`，coverage `done` 逐类别刷新（roof 6→8 · wall 2→3 · pillar 1→2 · door-window 0→2） |
 | 装配级校验器 | ✅ | `packages/schema/assembly.js`（§19.5 八条判据）+ 27 项回归（正向 + 逐条反例） |
 | **端到端装配** | ✅ | `assemblies/wanan-wall-corner-a.json`：转角墙墩 + 两向直墙（3 段）+ 望柱 + 门钉，6 实例 / 4 种构件 / 324 面；§19.5 八条判据**全绿**（含 1 处收容式嵌入） |
+| **首栋完整民居** | ✅ | `assemblies/minju-hard-mountain-a.json`：8 × 7 m 硬山，24 实例 / 8 种构件 / 1324 面，复用比 3.0；§19.5 **0 警告** |
 
-> **这一步证实的是「可装配」，不是「够用」。** 18 件只覆盖承重链下半截（台基 → 柱础 → 柱 → 枋 → 梁）与围护骨架；没有斗拱、没有瓦面成片、没有脊件，还拼不出一栋完整的房子。
+> **这一步证实的是「可装配」，不是「够用」。** 24 件覆盖承重链下半截（台基 → 柱础 → 柱 → 枋 → 梁）、围护骨架，以及民居六件灰模（屋面 / 檐柱 / 正脊 / 山墙 / 门 / 窗）。2026-10-22 **首栋完整民居** `minju-hard-mountain-a` 已过 §19.5（24 实例 / 8 构件 / 1324 面 / 0 警告）；下一步是补台基组合、梁架节点与真正的门窗洞口。
 
 **批 2 / 批 3 的前置 · 纸面收敛分析（2026-09-23）**
 
@@ -556,35 +558,41 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 
 | 层面 | 需求 | 在库 | **缺口** | credit |
 |---|---|---|---|---|
-| **构件**（§9.2 的 50 类） | 民居形制 **18 类**（`forms.js` `minju`）· **只建村、不建配殿** | **12** | **6 件**：`yanzhu-round-a` · `shanqiang-a` · `door-panel-double-a` · `window-fan-lattice-a` · `yingshan-single-a` · `ridge-main-a` | **≈ 180** |
-| 构件（若村里要连廊） | 廊形制 **13 类** | **10** | **3 件**（`yanzhu-round-a` · `ridge-main-a` · `balustrade-straight-a`）——**前两件已在上一行里，真增量只有 `balustrade-straight-a` 1 件** | 30 |
+| **构件**（§9.2 的 50 类） | 民居形制 **18 类**（`forms.js` `minju`）· **只建村、不建配殿** | **18**（含六件灰模） | **0 件** —— 民居骨架已齐 | **0** |
+| 构件（若村里要连廊） | 廊形制 **13 类** | **12** | **1 件** `balustrade-straight-a`（`yanzhu` / `ridge-main` 已随民居入库） | 30 |
 | **新构件（未登记）** | 残垣 / 废墟地基（学堂与废洞要半废态） | 0 | **待定 1–2 件**（`wall.qiang-ruin-a` / `base.foundation-ruin-a`）——**未进 §9.2，需先开卡再补表** | 30–60 |
-| **形制适配疑点** | `shanqiang-a` 现标注为「**歇山**三角」，而民居是**硬山** | — | **可能需要 1 件硬山山墙变体**（硬山山墙无"收山"台阶，形状不同）——**待实测，不在本表计数里** | 0 或 30 |
+| **形制适配疑点** | `shanqiang-a` 现标注为「**歇山**三角」，而民居是**硬山** | ✅ **已解** | 2026-10-21 按硬山做 **7 m 段**（平顶、三角由屋面封板表达），不再是歇山变体 | **0** |
 | **非构件类别** | 树 · 山石 · 草木 · 地面 · 道具 · 法器 | **0** | **8 个类别整段空白**：`kit.json.categories` 列了 `props/{lighting,street,ritual,furniture}`、`nature/{tree,rock,plant}`、`terrain/ground-tile`，但 `coverage` 里**连 `planned` 都没有定义** = **从未规划** | **未估** |
 
-> ⚠️ **两个口径别混用（本节第一版就在这上面算错过一次）**：`report.js` 的「复用 / 全新型」是**按批序累加**的口径——算到民居时，库里已经含前面配殿补进来的 `yanzhu` / `shanqiang` / `ridge-main`，于是显示"缺 3 件"。**M4 不建配殿**，所以对**当前 18 件真实库**的缺口是 **6 件、约 180 credit**，不是 3 件 / 90。复现：
+> ★ **2026-10-21 补记**：民居六件（硬山屋面 / 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗）已全部由 A 路改 **P**（程序化灰模 v1.0.0）并入库 ⇒ **民居缺口 = 0 件 / 0 credit**。灰模的正式美术可在后续版本升级，但**不再有任何“缺构件”的阻塞**。
+>
+> ⚠️ **两个口径别混用（本节第一版就在这上面算错过一次）**：`report.js` 的「复用 / 全新型」是**按批序累加**的口径——算到民居时，库里已经含前面配殿补进来的 `yanzhu` / `shanqiang` / `ridge-main`，于是显示"缺 3 件"。**M4 不建配殿**，所以对**当前 24 件真实库**的民居缺口是 **0 件**。复现：
 > `node -e "const{forms}=require('./build/convergence/forms');const{readLibrary}=require('./build/convergence/report');const L=new Set(readLibrary());const f=forms.find(x=>x.key==='minju');const n=[...new Set(f.parts)];console.log(n.filter(p=>!L.has(p)))"`
 > —— 这条命令就是本节数字的真源；**批序数不能拿来当采购单**。
 
-> **结论（这条比清单本身重要）**：M4 的排期瓶颈**不是** §9.2 那 50 类构件——建筑骨架只差 **6 件、约 180 credit**（且其中 3 件与城邑量产共用，砍不掉）。瓶颈在**那 8 个从未规划的类别**：一个只有屋体、没有地面／树／道具的场景拼不出来，而 `ROADMAP` 给 M4 的出口判据是「**删掉场景文件，能从 manifest 重新生成**」。
+> **结论（这条比清单本身重要）**：M4 的排期瓶颈**不是** §9.2 那 50 类构件——民居骨架 **18 类已齐**（其中六件为 0 credit 灰模），**首栋完整民居已装配通过**。现在唯一的硬缺口是**那 8 个从未规划的类别**：一个只有屋体、没有地面／树／道具的场景拼不出来，而 `ROADMAP` 给 M4 的出口判据是「**删掉场景文件，能从 manifest 重新生成**」。
 > **本节只指出缺口的形状，不替上游定数量**——`props/*` `nature/*` `terrain/*` 的件集是生产排期决策，产生方在 gbe-studio，**须另开卡**。已登记为遗留（guild `reviews/X-0031.md` §八 遗留 1）。
 
-### 9.5 完整生成队列（待生成 32 件 = 50 类 − 已入库 18 件）
+### 9.5 完整生成队列（待生成 26 件 = 50 类 − 已入库 24 件）
 
-> **对账**：`已入库 18`（全程序化 · 0 credit）+ `待生成 32` = 50。32 = **27 件 A** + **5 件 B**。证据：`node build/convergence/report.js`（库基线从 `kits/` 实读）+ `node build/convergence/reconcile.js`（三方对账）。
-> **排序口径**：**按「相对当前 18 件真实库的缺口」分档**，不按 `report.js` 的批序累加口径 —— 后者算到民居时已把配殿补的 `yanzhu` / `shanqiang` / `ridge-main` 当成"在库"，M4 不建配殿，**照它下单会少算 3 件**（详见 §9.4 的口径警示）。
-> ⚠️ 队列里**没有「待生成的程序化件」**：18 件程序化件已全部入库，P 路线到此为止。
+> ★ **2026-10-21 灰模补记**：民居六件（硬山屋顶 ＋ 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗）已全部用**程序化灰模 v1.0.0** 入库；
+> 路线由 A 改 **P**（0 credit）⇒ **已入库 24 / 待生成 26**，26 = **21 A + 5 B**。现数以 `reconcile.js` 为准。
+> 构件级校验全绿；其中硬山屋顶已通过“5 段直墙 ＋ 屋面”的装配试装。
 
-**档 0 · M4 槐阴村必做（6 件 ≈ 180 credit）**
+> **对账**：`已入库 24`（全程序化 · 0 credit）+ `待生成 26` = 50。26 = **21 件 A** + **5 件 B**。证据：`node build/convergence/report.js`（库基线从 `kits/` 实读）+ `node build/convergence/reconcile.js`（三方对账）。
+> **排序口径**：**按「相对当前 24 件真实库的缺口」分档**，不按 `report.js` 的批序累加口径 —— 后者算到民居时已把配殿补的 `yanzhu` / `shanqiang` / `ridge-main` 当成"在库"，M4 不建配殿，**照它下单会少算 3 件**（详见 §9.4 的口径警示）。
+> ⚠️ 队列里**没有「待生成的程序化件」**：24 件程序化件（18 primitive ＋ 民居六件灰模）已全部入库，P 路线到此为止。
 
-| asset id | 名称 | 路线 | 为什么村落少不了它 | 层级 |
-|---|---|---|---|---|
-| `cn-ancient.roof.yingshan-single-a` | 硬山单檐（整体） | A | 全村房子的屋顶本体 | L1 / mass |
-| `cn-ancient.pillar.yanzhu-round-a` | 檐柱（圆柱） | A | 承重主件（硬山同样要立柱） | L2 / component |
-| `cn-ancient.roof.ridge-main-a` | 正脊 | A | 硬山**只有**一条正脊，缺它屋顶不收口 | L2 / component |
-| `cn-ancient.wall.shanqiang-a` | 山墙（现标"歇山三角"） | A | 民居两山封闭 —— ⚠️ **硬山形状不同，可能需变体**（§9.4 疑点行） | L2 / component |
-| `cn-ancient.door-window.door-panel-double-a` | 双扇板门 | A | 农户大门 | L2 / component |
-| `cn-ancient.door-window.window-fan-lattice-a` | 扇形格扇窗 | A | 民居窗 | L2 / mass |
+**档 0 · M4 槐阴村必做（✅ 已齐 · 6 件灰模 · 0 credit）**
+
+| asset id | 名称 | 状态 | 说明 |
+|---|---|---|---|
+| `cn-ancient.roof.yingshan-single-a` | 硬山单檐（整体） | ✅ 已入库 | 10×2×7 m，16 三角；装配试装已过 |
+| `cn-ancient.pillar.yanzhu-round-a` | 檐柱（圆柱） | ✅ 已入库 | 3 m 高，柱身 0.4 m ＋ 0.5 m 柱脚套箍 |
+| `cn-ancient.roof.ridge-main-a` | 正脊 | ✅ 已入库 | 10 m 段，三层收分；两端 ridge-point |
+| `cn-ancient.wall.shanqiang-a` | 山墙（硬山 · 7 m 段） | ✅ 已入库 | 平顶墙身，三角由屋面封板表达 |
+| `cn-ancient.door-window.door-panel-double-a` | 双扇板门 | ✅ 已入库 | 2.0×2.4 m，双扇＋门框＋压条 |
+| `cn-ancient.door-window.window-fan-lattice-a` | 扇形格扇窗 | ✅ 已入库 | 2.0×1.5 m，下竖棂＋上扇形放射棂 |
 
 **档 1 · 城邑量产净新增（21 件 ≈ 630 credit · 批 2–批 3）**
 
@@ -612,7 +620,7 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 20 | `cn-ancient.beam.caihua-fang-a` | 彩画枋（带彩画） | 牌坊 | L2 / mass |
 | 21 | `cn-ancient.roof.luding-single-a` | 盝顶（整体） | 牌坊（若牌坊先走整栋拆分，**此件可由拆分产物顶替，省 30**） | L1 / mass |
 
-> 档 0 + 档 1 = **27 件 A**（= 配殿所需 18 件全新型 ∪ 民居 / 商铺 / 亭 / 牌坊 的增量，**廊的净新增为 0**：13 类全被已入库件 + 档 0/档 1 覆盖）。
+> 档 1 = **21 件 A**（配殿 18 件全新型 ∪ 商铺 / 亭 / 牌坊 的增量；民居六件已改 P，故比改判前少 6 件。**廊的净新增只剩 `balustrade-straight-a` 1 件**，已含在档 1 第 12 行）。
 
 **档 2 · hero（5 件 · B 路 · 0 额外 credit · 批 4）**
 
@@ -626,7 +634,7 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 
 > 这 5 件在 §9.2 的路线列写 **B**，依据是 §10.5(b) 的来源裁决：**只被 hero 形制消费、且尚未入库的件不许单开 AI 直生**（hero 专属件实测 **7** 件，另两件 `plinth-lotus-a` / `liang-seven-purlin` 已随程序化入库、不在此列）。生成费已含在 §9.2 预算的 `3 × 55` 里，所以本档 credit = 0——**但这 5 件是批 4 的硬依赖**：整栋拆分一失败，hero 就没有产物来源（风险见 §11）。
 
-**汇总**：档 0 `6` + 档 1 `21` + 档 2 `5` = **32 件** ✓（A 路 27 ＋ B 路 5）；credit = 180 + 630 = **810**（A 路 27 件 × 30），加 `3 × 55 = 165` 的整栋生成 = **975** ✓ 与 §9.2 预算行一致。**总账没变，变的只是"哪些件属于 M4"**——按批序口径会把 M4 少算 3 件（见 §9.4）。
+**汇总**：档 0 `0`（已齐） + 档 1 `21` + 档 2 `5` = **26 件** ✓（A 路 21 ＋ B 路 5）；credit = 0 + 630 = **630**（A 路 21 件 × 30），加 `3 × 55 = 165` 的整栋生成 = **795** ✓ 与 §9.2 预算行一致。**总账比改判前少 180 credit，原因是民居六件全部走 P（0 成本）**——按批序口径仍会把 M4 少算 3 件（见 §9.4）。
 
 ---
 
@@ -732,7 +740,7 @@ AI 生成的构件，尺寸是"看起来差不多"。两个构件的插槽位置
 | 构件总表（50 类 · 唯一真源） | **本文 §9.2** —— `forms.js` 的 `parts` 与 `kit.json` 的 `coverage.*.planned` 必须是其子集／相等集，`reconcile.js` 抓漂移 |
 | 形制数量（远期城邑 28 栋） | **本文 §9.1** —— `forms.js` 的 `count` 逐行等于本表 |
 | M4 场景需求（村落配比 · 类别缺口） | **本文 §9.4**；逐场景 `resource-manifest.yaml` 归 **dalu**，本仓不写 |
-| 待生成队列（32 件三档 · 顺序与 credit） | **本文 §9.5**；外部仓（`qiuyuan-guild/reviews/X-*.md`）**只准指本节，禁止复制件表** |
+| 待生成队列（26 件三档 · 顺序与 credit） | **本文 §9.5**；外部仓（`qiuyuan-guild/reviews/X-*.md`）**只准指本节，禁止复制件表** |
 | hero 档判定（卡来源不卡件数） | **本文 §10.5(b)** —— 代码侧参数见 `build/convergence/forms.js` 的 `THRESHOLDS` 与 `heroExclusiveParts()` |
 | 拆分工序、粒度判据、批次排期 | **本文** |
 | 拆分层在生产端的定位 | `docs/PLAN.md` §6.1 |

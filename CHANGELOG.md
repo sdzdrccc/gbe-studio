@@ -19,6 +19,32 @@
 
 ## [未发布]
 
+## [0.7.0] - 2026-10-22
+
+### 新增
+- **硬山单檐整体屋面灰模**（`cn-ancient.roof.yingshan-single-a`）：10 × 2 × 7 m，一次挤出成封闭两坡体，
+  16 三角、4 插槽（bottom / ridge-west / ridge-east / ridge-seat），0 credit。用于 M4 槐阴村“先有屋顶可拼”。
+- **民居五件灰模**（全部 0 credit）：檐柱 `yanzhu-round-a`（3 m，0.4 m 柱身＋0.5 m 柱脚套箍）、
+  正脊 `ridge-main-a`（10 m 段，三层收分）、山墙 `shanqiang-a`（7×3×0.5 m，硬山平顶段）、
+  双扇板门 `door-panel-double-a`（2.0×2.4 m）、扇形格扇窗 `window-fan-lattice-a`（2.0×1.5 m）。
+  民居形制 18 类至此**全部在库**。
+- **装配配方可选**：`assemble.js --recipe <key>`；新增 `yingshan-roof-test-a`（5 段 2 m 直墙 ＋ 1 件屋面 ＋ 1 件正脊，
+  7 实例 / 3 独特构件，§19.5 八条判据全绿）。默认配方仍是 `wanan-wall-corner-a`。
+- **首栋完整民居** `minju-hard-mountain-a`：8 × 7 m 硬山，前后各 4 段直墙 ＋ 两山墙 ＋ 9 根檐柱 ＋
+  10×7 屋面 ＋ 正脊 ＋ 双扇门 ＋ 扇形窗（窗下阶条石窗台）。**24 实例 / 8 独特构件 / 1324 面**，
+  复用比 3.0，`assembly-check` 0 警告。
+- `BUILDING-DECOMPOSITION` §9.2 第 6 / 20 / 21 / 24 / 33 / 38 行 **由 A 改 P**（民居六件灰模先行，0 credit）；
+  §1.2 / §9.2 / §9.3 / §9.4 / §9.5 的路线条数、缺口与 credit 同步：**24 P / 21 A / 5 B**，
+  待生成 **26 件**，建库预算 **795 credit**；民居骨架 **18 类全部在库**。
+  `procedural.smoke` 的期望件数 18 → 24。
+
+### 修错
+- `assemble.js` 院墙转角配方的 `params.instance_count` 由 **5 改为 6** —— 实有 6 个实例
+  （墩 + 3 墙 + 望柱 + 门钉），派生计数判据（`X-0032 A-7`）会当场拦下。
+
+### 变更
+- 民居六件灰模与首栋完整民居装配
+
 ## [0.6.8] - 2026-10-19
 
 ### 修错

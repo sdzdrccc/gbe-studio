@@ -5,10 +5,10 @@
  * procedural.smoke.js —— 程序化构件生成器的冒烟测试（`X-0053` S-4 补测）
  *
  * 为什么需要它：`build/procedural/*` 是**没有 AI 成本、却直接写入资产库**的那条路
- * （18 件构件、0 credit）。它此前**零测试** —— 几何内核改坏了，没有任何红。
+ * （24 件构件、0 credit）。它此前**零测试** —— 几何内核改坏了，没有任何红。
  *
  * 判据（每条都对应一个"改坏了不会报错"的地方）：
- *   ① 18 件全部 `ok`（自检错误为 0）
+ *   ① 24 件全部 `ok`（自检错误为 0）
  *   ② **确定性**：同参数两次生成，GLB **逐字节相同**（recipe_hash 的承诺）
  *   ③ 插槽落定位网格 `snap_m = 0.5`（CONVENTIONS §19.2 硬约束；attach 豁免）
  *   ④ 面数不超该件的 `tier` 预算（`kit.budgets`）
@@ -102,9 +102,9 @@ for (const spec of components) {
 
 // 覆盖自证：不许"0 件也算过"
 if (counted === 0) fail('*', '一件都没跑成 —— 禁止空集通过');
-if (components.length !== 18) notes.push(`构件数 ${components.length}（方案表记 18 —— ★ 变了要同步文档）`);
+if (components.length !== 24) notes.push(`构件数 ${components.length}（方案表记 24 —— ★ 变了要同步文档）`);
 
-console.log('[procedural.smoke] 18 件程序化构件 · 生成 → 复现 → 网格 → 预算 → 读回');
+console.log('[procedural.smoke] 24 件程序化构件 · 生成 → 复现 → 网格 → 预算 → 读回');
 console.log(`  构件 ${components.length} 件 · 通过自检 ${counted} 件`);
 for (const n of notes) console.log(`  ⚠ ${n}`);
 for (const f of failures) console.log(`  ✗ ${f}`);

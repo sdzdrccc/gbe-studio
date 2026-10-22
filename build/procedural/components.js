@@ -1,11 +1,12 @@
 'use strict';
 
 /**
- * components.js —— 18 件程序化构件的定义（BUILDING-DECOMPOSITION §9.2 中标记为 P 的全部）
+ * components.js —— 程序化构件的定义（BUILDING-DECOMPOSITION §9.2 中标记为 P 的全部）
  *
- * 这 18 件是整套构件化方案里**性价比最高的一笔**：0 credit、确定性可重建、
+ * 这 24 件是整套构件化方案里**性价比最高的一笔**：0 credit、确定性可重建、
  * 不依赖任何平台与网络。它们撑起了承重链的下半截（台基 → 柱础 → 柱 → 枋 → 梁 → 屋面）
- * 与围护的骨架（阶条石 / 墙段 / 转角墙 / 栏杆）。
+ * 与围护的骨架（阶条石 / 墙段 / 转角墙 / 栏杆），外加民居六件灰模
+ * （硬山屋面 / 檐柱 / 正脊 / 山墙 / 双扇门 / 扇形窗）。
  *
  * ── 三条硬纪律（写在定义里，也由 generate.js 逐件复验）──
  *  ① 插槽位置**必须落 snap_m = 0.5 m 定位网格**（attach 类除外）。定位一松，跨批次拼装就散了。
@@ -24,7 +25,7 @@ const { addBox, addCylinder, addDome, addExtrude, addSweptBeam, troughProfile } 
 const V = '1.0.0';
 const LIC = 'CC0-1.0';
 
-// ── 插槽工厂（把 mate_types 的约定收在一处，免得 18 件各写一遍写岔）─────────────
+// ── 插槽工厂（把 mate_types 的约定收在一处，免得 24 件各写一遍写岔）─────────────
 const MATE = {
   foot: ['stack-up', 'roof-seat'], // 底面：坐在别人的顶面上
   top: ['ground-foot'], // 顶面：接住别人的底面
@@ -253,6 +254,39 @@ const components = [
   // ═════════════════════════════════════════════════════════════════════════
 
   {
+    name: 'yanzhu-round-a',
+    title: '檐柱（圆柱）',
+    category: 'components/pillar',
+    tier: 'component',
+    granularity: 'L2',
+    tags: ['pillar', 'column', 'eave', 'timber', '程序化'],
+    summary:
+      '民居檐柱：高 3.0 m（story_heights_m[0]）、柱身径 0.4 m，下粗上细 0.2→0.18 —— 收分是木柱的做法。' +
+      '柱脚加 0.5 m 见方的木套箍（0.1 m 高），既保护柱脚，也让整体尺寸落 0.5 造型网格。' +
+      '底面落柱础 top，柱头顶额枋 / 梁。',
+    collision: 'box',
+    slots: [
+      { slot: 'pillar', ref: 'timber/ben-se' },
+      { slot: 'trim', ref: 'timber/hei-qi' },
+    ],
+    sockets: [
+      sock.foot([0, 0, 0], '坐在柱础顶面（plinth-fupen-a 的 top）'),
+      sock.top([0, 3.0, 0], '柱头承额枋 / 梁'),
+    ],
+    build(M) {
+      addBox(M, { size: [0.5, 0.1, 0.5], at: [0, 0.05, 0], slot: 'trim' });
+      addCylinder(M, {
+        r1: 0.2,
+        r2: 0.18,
+        h: 2.9,
+        seg: 12,
+        at: [0, 0.1, 0],
+        slot: 'pillar',
+      });
+    },
+  },
+
+  {
     name: 'guazhu-a',
     title: '瓜柱',
     category: 'components/pillar',
@@ -409,6 +443,143 @@ const components = [
     },
   },
 
+  {
+    name: 'shanqiang-a',
+    title: '山墙（硬山 · 7 m 段）',
+    category: 'components/wall',
+    tier: 'component',
+    granularity: 'L2',
+    tags: ['wall', 'shanqiang', 'gable', '程序化'],
+    summary:
+      '硬山民居的侧墙：长 7.0 m（= 屋面总进深）、高 3.0 m、厚 0.5 m，石勒脚 + 土坯墙身 + 压顶。' +
+      '本地坐标沿 X 展开，装配时绕 Y 转 90° 落在房屋两端；屋顶的平底面直接压住它的顶。' +
+      '山墙的三角部分由硬山屋面自身封板表达，本件只做墙身 —— 灰模先把承重与围护分开。',
+    collision: 'box',
+    slots: [
+      { slot: 'wall', ref: 'earth/hang-tu' },
+      { slot: 'trim', ref: 'stone/qing-shi' },
+    ],
+    sockets: [
+      sock.foot([0, 0, 0], '承重基准点（轴心）'),
+      sock.top([0, 3.0, 0], '墙顶承屋面'),
+      {
+        name: 'roof-seat',
+        type: 'roof-seat',
+        direction: '+y',
+        position_m: [0, 3.0, 0],
+        mate_types: ['ground-foot', 'stack-up'],
+        grid_locked: true,
+        note: '硬山整体屋面的 bottom 落此面',
+      },
+      sock.west([-3.5, 0, 0], '与前后墙 / 转角件续接'),
+      sock.east([3.5, 0, 0], '与前后墙 / 转角件续接'),
+      sock.run([3.5, 0, 0], '+x', 3.5, '同轴续接时按 3.5 m 步距（半跨）'),
+    ],
+    build(M) {
+      addBox(M, { size: [7.0, 0.3, 0.5], at: [0, 0.15, 0], slot: 'trim' });
+      addBox(M, { size: [7.0, 2.55, 0.5], at: [0, 1.575, 0], slot: 'wall' });
+      addBox(M, { size: [7.0, 0.15, 0.5], at: [0, 2.925, 0], slot: 'trim' });
+    },
+  },
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // 门窗 components/door-window
+  // ═════════════════════════════════════════════════════════════════════════
+
+  {
+    name: 'door-panel-double-a',
+    title: '双扇板门',
+    category: 'components/door-window',
+    tier: 'component',
+    granularity: 'L2',
+    tags: ['door', 'gate', 'timber', '程序化'],
+    summary:
+      '民居双扇板门：洞口 2.0 × 2.4 m、厚 0.25 m。门槛 + 左右门框 + 上槛 + 两扇门板，' +
+      '中间留 0.05 m 门缝。它是“填充件”，装配时贴在墙洞位置；bottom 只用于落地定位，' +
+      '真正的宿主是墙的 wall-line / attach。',
+    collision: 'box',
+    slots: [
+      { slot: 'door', ref: 'timber/zhu-hong' },
+      { slot: 'trim', ref: 'timber/hei-qi' },
+    ],
+    sockets: [
+      sock.foot([0, 0, 0], '落地定位；装配时通常由墙洞承接'),
+      sock.west([-1.0, 0, 0], '左侧门框，接墙洞'),
+      sock.east([1.0, 0, 0], '右侧门框，接墙洞'),
+      sock.mount([0, 1.2, 0], '-z', '背贴墙面（attach 单向挂接）'),
+    ],
+    build(M) {
+      // 门槛
+      addBox(M, { size: [2.0, 0.1, 0.25], at: [0, 0.05, 0], slot: 'trim' });
+      // 左右门框
+      addBox(M, { size: [0.15, 2.3, 0.25], at: [-0.925, 1.25, 0], slot: 'trim' });
+      addBox(M, { size: [0.15, 2.3, 0.25], at: [0.925, 1.25, 0], slot: 'trim' });
+      // 上槛
+      addBox(M, { size: [2.0, 0.2, 0.25], at: [0, 2.3, 0], slot: 'trim' });
+      // 两扇门板（留 0.05 门缝）
+      addBox(M, { size: [0.82, 2.05, 0.1], at: [-0.435, 1.125, 0], slot: 'door' });
+      addBox(M, { size: [0.82, 2.05, 0.1], at: [0.435, 1.125, 0], slot: 'door' });
+      // 门板横向压条（最省面的“板门”细节）
+      for (const y of [0.55, 1.25, 1.95]) {
+        addBox(M, { size: [0.82, 0.08, 0.04], at: [-0.435, y, 0.07], slot: 'trim' });
+        addBox(M, { size: [0.82, 0.08, 0.04], at: [0.435, y, 0.07], slot: 'trim' });
+      }
+    },
+  },
+
+  {
+    name: 'window-fan-lattice-a',
+    title: '扇形格扇窗',
+    category: 'components/door-window',
+    tier: 'mass',
+    granularity: 'L2',
+    tags: ['window', 'lattice', 'fan', '程序化'],
+    summary:
+      '民居扇形格扇窗：洞口 2.0 × 1.5 m、厚 0.25 m。下部竖棂 + 上部放射状扇骨，' +
+      '用 7 根绕 Z 旋转的薄盒拼出扇形，0 成本且可参数化。窗是填充件，装配时贴墙洞。',
+    collision: 'box',
+    slots: [
+      { slot: 'window', ref: 'timber/ben-se' },
+      { slot: 'trim', ref: 'timber/hei-qi' },
+    ],
+    sockets: [
+      sock.foot([0, 0, 0], '落地定位；装配时通常由墙洞承接'),
+      sock.west([-1.0, 0, 0], '左侧窗框，接墙洞'),
+      sock.east([1.0, 0, 0], '右侧窗框，接墙洞'),
+      sock.mount([0, 0.75, 0], '-z', '背贴墙面（attach 单向挂接）'),
+    ],
+    build(M) {
+      // 外框
+      addBox(M, { size: [0.12, 1.5, 0.25], at: [-0.94, 0.75, 0], slot: 'trim' });
+      addBox(M, { size: [0.12, 1.5, 0.25], at: [0.94, 0.75, 0], slot: 'trim' });
+      addBox(M, { size: [2.0, 0.12, 0.25], at: [0, 0.06, 0], slot: 'trim' });
+      addBox(M, { size: [2.0, 0.12, 0.25], at: [0, 1.44, 0], slot: 'trim' });
+
+      // 下部竖棂：5 根，居中排开
+      for (let i = 0; i < 5; i++) {
+        const x = -0.6 + i * 0.3;
+        addBox(M, { size: [0.08, 0.9, 0.08], at: [x, 0.58, 0], slot: 'window' });
+      }
+
+      // 上部扇形：中心 (0,0.75)，7 根放射棂
+      const cx = 0;
+      const cy = 0.75;
+      const fanR = 0.58;
+      for (let i = 0; i < 7; i++) {
+        const a = (Math.PI / 6) + (i * Math.PI) / 9; // 30°..150°
+        const rMid = fanR * 0.5;
+        addBox(M, {
+          size: [0.06, fanR, 0.08],
+          at: [cx + Math.cos(a) * rMid, cy + Math.sin(a) * rMid, 0],
+          rot: [0, 0, a - Math.PI / 2],
+          slot: 'window',
+        });
+      }
+      // 扇心
+      addBox(M, { size: [0.16, 0.16, 0.1], at: [cx, cy, 0], slot: 'trim' });
+    },
+  },
+
   // ═════════════════════════════════════════════════════════════════════════
   // 屋顶 components/roof
   // ═════════════════════════════════════════════════════════════════════════
@@ -562,6 +733,101 @@ const components = [
     ],
     build(M) {
       addBox(M, { size: [2.0, 0.5, 0.1], at: [0, 0.25, 0], slot: 'trim' });
+    },
+  },
+
+  {
+    name: 'ridge-main-a',
+    title: '正脊（10 m 段）',
+    category: 'components/roof',
+    tier: 'component',
+    granularity: 'L2',
+    tags: ['roof', 'ridge', 'main', '程序化'],
+    summary:
+      '硬山正脊：长 10.0 m（与屋面脊长一致）、宽 0.5 m、高 0.5 m。三层收分（底座 → 脊身 → 脊顶），' +
+      '两端留 ridge-point 供垂脊 / 脊兽续接；bottom 坐在硬山屋面的 ridge-seat 上。',
+    collision: 'box',
+    slots: [{ slot: 'roof', ref: 'roof-tile/qingwa' }],
+    sockets: [
+      sock.foot([0, 0, 0], '坐在硬山屋面的 ridge-seat 上'),
+      sock.ridge('ridge-west', [-5.0, 0, 0], '-x', '正脊西端，接垂脊 / 脊兽'),
+      sock.ridge('ridge-east', [5.0, 0, 0], '+x', '正脊东端，接垂脊 / 脊兽'),
+      sock.top([0, 0.5, 0], '脊顶，后续可挂脊饰'),
+    ],
+    build(M) {
+      addBox(M, { size: [10.0, 0.2, 0.5], at: [0, 0.1, 0], slot: 'roof' });
+      addBox(M, { size: [10.0, 0.2, 0.36], at: [0, 0.3, 0], slot: 'roof' });
+      addBox(M, { size: [10.0, 0.1, 0.24], at: [0, 0.45, 0], slot: 'roof' });
+    },
+  },
+
+  /**
+   * ★ 2026-10-21 试点：硬山单檐整体屋顶（灰模）。
+   *
+   * 这是 GBE 程序化路线第一次做「整体屋面」，不是瓦片 / 椽 / 檩那种零件。
+   * 为什么先做它：民居是 M4 槐阴村的唯一建筑形制，屋顶是六件必备构件里最难的一件；
+   * 它若能用现有几何内核做出来，剩下的柱 / 脊 / 山墙 / 门 / 窗都是同一套做法。
+   *
+   * 形制口径（硬山）：
+   *   · 两坡，屋脊与两山墙齐平（不出山），所以 X 向不做悬挑；
+   *   · 本件只做「两坡整体 + 山面封板」，正脊是独立件 `ridge-main-a`，不烘进来；
+   *   · 底面是平的——灰模按「整体屋面体」处理，屋架 / 檩条在内部，不在本件表达；
+   *     这样它能直接坐在墙顶 / 檐檩上，装配校验也只看这一条承重链。
+   *
+   * 尺寸（先取民居三开间的一组整数，落 0.5 定位网格 / 0.25 造型网格）：
+   *   · 脊长 10.0 m（含两端与山墙齐平）
+   *   · 总进深 7.0 m（含前后各 0.5 m 檐口）
+   *   · 底面 y=0，脊顶 y=2.0
+   *
+   * 几何做法：在 XY 平面画「五边形两坡」的闭合剖面（底边平），沿 Z 挤出 10 m，
+   * 再绕 Y 转 90° ⇒ 挤出方向变成面阔 X，剖面变成进深 Z。这样一次挤出就是
+   * 一个封闭的两坡体，山面自带封板，不需要再拼两块斜板。
+   */
+  {
+    name: 'yingshan-single-a',
+    title: '硬山单檐（整体 · 灰模）',
+    category: 'components/roof',
+    tier: 'mass',
+    granularity: 'L1',
+    tags: ['roof', 'yingshan', 'hard-mtn', '程序化', '灰模'],
+    summary:
+      '硬山两坡整体屋面：脊长 10 m、总进深 7 m、脊高 2 m。一次挤出成封闭两坡体，山面自带封板；' +
+      '正脊另件（ridge-main-a）。本件是灰模试点，用来验证「整体屋面能否程序化」，不是最终美术件。',
+    collision: 'box',
+    slots: [{ slot: 'roof', ref: 'roof-tile/qingwa' }],
+    sockets: [
+      sock.foot([0, 0, 0], '坐在檐檩 / 墙顶；硬山两山与山墙齐平，X 向不悬挑'),
+      sock.ridge('ridge-west', [-5.0, 2.0, 0], '-x', '正脊西端（与山墙齐平）'),
+      sock.ridge('ridge-east', [5.0, 2.0, 0], '+x', '正脊东端（与山墙齐平）'),
+      {
+        name: 'ridge-seat',
+        type: 'roof-seat',
+        direction: '+y',
+        position_m: [0, 2.0, 0],
+        mate_types: ['ground-foot', 'stack-up'],
+        grid_locked: true,
+        note: '正脊落此面（ridge-main-a 的 bottom 接这里）',
+      },
+    ],
+    build(M) {
+      // 五边形剖面：檐口底 → 檐口顶 → 脊顶 → 另一侧檐口顶 → 檐口底。
+      // 最低点 y=0，归位偏移为 0 ⇒ 插槽坐标可以按世界尺度直接写。
+      const profile = [
+        [-3.5, 0.0],
+        [-3.5, 0.25],
+        [0.0, 2.0],
+        [3.5, 0.25],
+        [3.5, 0.0],
+      ];
+      // 挤出长度 10 m 沿局部 Z；绕 Y 转 +90° 后，局部 Z → 世界 X，剖面 X → 世界 -Z。
+      // at 的 -5 把挤出段从 0..10 挪到 -5..5，使屋顶在 X 上居中。
+      addExtrude(M, {
+        profile,
+        length: 10.0,
+        at: [-5.0, 0, 0],
+        rot: [0, Math.PI / 2, 0],
+        slot: 'roof',
+      });
     },
   },
 

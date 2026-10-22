@@ -6,7 +6,7 @@
  * 一次跑完：几何 → 归位 → 插槽换算 → glb → 预览图 → asset.json / source.json → 逐件自检。
  *
  * 用法：
- *   node build/procedural/generate.js                    # 生成全部 18 件，投递到 gbe-assets/inbox/
+ *   node build/procedural/generate.js                    # 生成全部 24 件程序化构件（18 primitive ＋ 民居六件灰模），投递到 gbe-assets/inbox/
  *   node build/procedural/generate.js --only ding-door   # 只生成一件
  *   node build/procedural/generate.js --check            # 只跑自检，不落盘
  *   node build/procedural/generate.js --out <dir>        # 自定义投递目录
