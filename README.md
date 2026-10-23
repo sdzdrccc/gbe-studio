@@ -37,6 +37,8 @@
 
 ## 完整项目结构
 
+> 这是速查图；新增文件先查 [`docs/REPO-LAYOUT.md`](docs/REPO-LAYOUT.md) 的落点表与决策树。
+
 ```
 gbe-studio/
 │
@@ -130,7 +132,12 @@ gbe-studio/
 │   ├── gbe-engine/                  引擎落地（留位）
 │   └── gbe-cost/                    成本账本查询（留位）
 │
-├── pipeline/                    提示词库与流水线编排（留位）
+├── pipeline/                 ★   批次产线（提示词 → 图 → GLB → LOD）
+│   ├── prompts/                 提示词与三视图设定稿（入 Git）
+│   ├── source-images/           图像模型原图（不入 Git）
+│   ├── tools/                   归一化 / 预览脚本（入 Git）
+│   ├── out/                     切图 / GLB / LOD / 预览（不入 Git）
+│   └── reports/                 批次报告（入 Git）
 ├── qa/                          QA Gate 门禁（留位）
 ├── scripts/                 ★   仓库自身工具
 │   ├── version.js               版本工具：show / log / bump / check / sync
@@ -140,7 +147,8 @@ gbe-studio/
 │
 └── docs/
     ├── PLAN.md                  生产端完整方案
-    └── BUILDING-DECOMPOSITION.md ★ 场景建筑拆分细化方案
+    ├── BUILDING-DECOMPOSITION.md ★ 场景建筑拆分细化方案
+    └── REPO-LAYOUT.md           ★ 目录与文档规范（本结构图的判据）
 ```
 
 > **图例**：★ = 真源或关键文件；`（只读视图）` = 由真源生成、禁止手改；`（留位）` = 目录已建、实现未做。
@@ -241,6 +249,9 @@ node engines/base.js probe godot         # 端口连通性
 |---|---|
 | [`docs/PLAN.md`](docs/PLAN.md) | 生产端完整方案 |
 | [`docs/BUILDING-DECOMPOSITION.md`](docs/BUILDING-DECOMPOSITION.md) | ★ 场景建筑拆分细化方案（分层 / 模数 / 两条产线 / 粒度判据 / 万安城排期） |
+| [`docs/REPO-LAYOUT.md`](docs/REPO-LAYOUT.md) | ★ 目录与文档规范（根目录白名单 / 域目录 / pipeline 五段 / 命名 / 入 Git 判据） |
+| [`docs/LOD-PIPELINE.md`](docs/LOD-PIPELINE.md) | ★ LOD 与简化器设计（三轨：构件重建 / 带锁减面 / 重拓扑烘焙；门禁判据） |
+| [`pipeline/README.md`](pipeline/README.md) | ★ 批次产线：prompts → source-images → refs → normalized → lod → report |
 | [`CHANGELOG.md`](CHANGELOG.md) | 更新日志 |
 | [`AGENTS.md`](AGENTS.md) | AI 助手在本仓的工作纪律 |
 | `../gbe-assets/docs/DECISIONS.md` | ★ 决策台账（ADR-0001 ~ 0007） |

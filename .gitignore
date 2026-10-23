@@ -26,7 +26,8 @@ temp/
 *.log
 
 # ---- 生成物 / 中间态 ----
-pipeline/generated-images/
+pipeline/out/
+pipeline/source-images/
 decompose/quarantine/
 decompose/out/
 build/out/
@@ -38,6 +39,10 @@ npm-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# ---- Python ----
+__pycache__/
+*.pyc
+
 # ---- 编辑器 / 系统 ----
 .DS_Store
 Thumbs.db
@@ -45,3 +50,5 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.swp
+# 编辑器状态（每次打开都变，不是项目源）
+.obsidian/workspace.json

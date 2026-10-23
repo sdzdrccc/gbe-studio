@@ -120,7 +120,10 @@
 | 类 | 位置 | 命名 | 说明 |
 |---|---|---|---|
 | **开工纪律** | 仓根 `AGENTS.md` | 固定名 | ★ 本文件；★ 改它要写进 `CHANGELOG.md` 的新条目 |
-| **本仓方案** | `docs/` | `UPPER-KEBAB.md` | `PLAN.md`（生产端完整方案）· `BUILDING-DECOMPOSITION.md`（场景建筑拆分细化方案） |
+| **本仓方案** | `docs/` | `UPPER-KEBAB.md` | `PLAN.md`（生产端完整方案）· `BUILDING-DECOMPOSITION.md`（场景建筑拆分细化方案）· `LOD-PIPELINE.md`（LOD/简化器三轨设计） |
+| ★ **目录 / 文档规范** | `docs/REPO-LAYOUT.md` | `UPPER-KEBAB.md` | ★ 本表的展开：根目录白名单、域目录职责、`pipeline/` 五段、命名、入 Git 矩阵、新文件落点决策树 |
+| ★ **批次产线** | `pipeline/` | `<batch>/` = `pilot-YYYY-MM-DD` | ★ `prompts/`（提示词）· `source-images/`（原图，**不入 Git**）· `tools/`（脚本）· `out/`（切图/GLB/LOD/预览，**不入 Git**）· `reports/`（批次报告） |
+| ★ **批次报告** | `pipeline/reports/` | `PILOT-YYYY-MM-DD.md` | ★ 每批一份；写源/结果 tris、bbox、贴图、材质、已知不足、复跑命令；★ **不要搬进 `docs/`** |
 | **版本真源** | `VERSION` ＋ `CHANGELOG.md` | 固定名 | ★ **不许手改** —— 一律走 `node scripts/version.js`（§2.7）；★ `package.json.version` 同理 |
 | **策略 / 注册表**（数据，非文档） | `core/policy/` · `core/registry/` | `kebab-case.json` | `providers.json` · `engines.json` · `mcp.json` · `fallback.json` · `budget.json` |
 | **引擎适配** | `engines/<engine>/` | 目录小写 | `semantic_map.json`（8 个语义动作的落地映射） |
@@ -136,8 +139,11 @@
 1. ★ **文档一律 `.md` ＋ 全大写-连字符**（`PLAN.md` · `BUILDING-DECOMPOSITION.md`）。★ 不用空格、不用驼峰。
 2. ★★ **文件名与目录名一律 ASCII** —— ★ 实测本仓当前 **0 个非 ASCII 名**，★ **保持**；
    ★ 要写中文说明就写进文档**正文**，★ **别写进文件名**。
-3. **目录名一律小写-kebab** · **JSON 配置一律 kebab-case** · **脚本一律 kebab-case.js**。
-4. **不留空壳** —— 没有内容可写的文件不要建（占位 = 把"还没想清楚"伪装成"已完成"）。
+3. **目录名一律小写-kebab** · **JSON 配置一律 kebab-case** · **脚本一律 kebab-case.js / .py**。
+4. **批次目录** 一律 `pilot-YYYY-MM-DD`；**LOD** 一律 `<asset>-lod<N>-<tris>k.glb`；**预览** 一律 `<asset>-<stage>-<view>.png`。
+5. **不留空壳** —— 没有内容可写的文件不要建（占位 = 把"还没想清楚"伪装成"已完成"）；目录有内容后删 `.gitkeep`。
+6. **根目录不放素材 / 临时文件** —— 原图、截图、`.glb`、`.zip` 一律进 `pipeline/` 对应段；编辑器状态（`.obsidian/workspace.json`）不入 Git。
+7. **入 Git 判据** —— "下次 clone 后没有它还能不能复跑？" 能 ⇒ 不进；不能 ⇒ 进。`out/`、`source-images/`、`build/out/`、`decompose/out/` 默认不进。
 
 ---
 

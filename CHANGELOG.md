@@ -19,6 +19,23 @@
 
 ## [未发布]
 
+## [0.9.0] - 2026-10-23
+
+### 变更
+- **屋面轨 C 重拓扑（9k）**：新增 `pipeline/tools/lod/retopo-bake.py`（Blender 5.2 headless，只依赖自带 numpy）。
+  voxel 0.03 把 2,773 个瓦件壳并成一张水密面 → decimate → Smart UV → Cycles 烘 2K baseColor/normal；
+  屋面 49,958 → **8,996 tris（−82%）**，bbox 精确、水密、UV 45.2%，贴图搭建筑与 50k 接近，复跑 GLB/贴图逐字节一致。
+  村景/中景主用 9k，29k 保边界版留中间档，50k 保留 hero。Quadriflow 在 headless 下 0.0s 不生效，失败件归档。
+- **屋面轨 B LOD（29k）**：新增 `pipeline/tools/lod/{simplify-attr,validate-lod,inspect-glb,analyze-mesh}.js`。
+  屋面 49,958 → **28,944 tris**（−42%），分件预算保护 1,691 个小瓦件，边界 99.99%、bbox 精确，几何门禁 + 搭建筑门禁通过。
+  测得屋面是 **2,773 个独立瓦件 / 32,987 个边界点**，保边界拓扑下限约 29k；20k 全局减面与 `Permissive` 候选均毁檐口/瓦面，归档 `out/_archive/.../lod-failed/yingshan-attr/`。
+  LOD 工具输出非交错 GLB（`VertexLayout.SEPARATE`）；依赖 `meshoptimizer` + `@gltf-transform/*` 声明在根 `devDependencies`，`node_modules` 不入 Git。
+- **檐柱轨 A 重建**：新增 `pipeline/tools/bake-column-texture.py` + `rebuild-column.py`；檐柱 41,333 → **384 tris**，0.48×3×0.48 m，套箍/平顶，1024×2048 圆柱 baseColor 从高模烘焙。
+- **LOD 与简化器设计**：新增 `docs/LOD-PIPELINE.md` —— glTF-Transform 直减失败（柱锥化/屋面压薄），改为三轨：构件重建 / 带锁属性感知减面 / 重拓扑烘焙；门禁必须搭建筑复核。P1（檐柱 384 tris）、P2（屋面 29k 保边界）、P3（屋面 9k 重拓扑 + 烘焙）已落地。
+- **仓库目录与文档规范**：新增 `docs/REPO-LAYOUT.md`、`pipeline/README.md` 与批次报告 `pipeline/reports/PILOT-2026-10-22.md`。
+  `vibe_images/` → `pipeline/source-images/pilot-2026-10-22/`；`pipeline/generated-images/` → `pipeline/out/pilot-2026-10-22/{refs,normalized,lod,preview}/`；
+  `out/` 与 `source-images/` 不入 Git；`.obsidian/workspace.json` 取消跟踪；`pipeline/.gitkeep` 移除。
+
 ## [0.8.0] - 2026-10-22
 
 ### 新增
