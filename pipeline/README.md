@@ -13,7 +13,9 @@
 | `out/` | 切图、归一化 GLB、LOD、预览 | ❌ | `<batch>/{refs,normalized,lod,preview}/` |
 | `reports/` | 批次报告：统计、门禁、已知不足 | ✅ | `<BATCH>.md` |
 
-**批次目录名**统一 `pilot-YYYY-MM-DD`。本批是 `pilot-2026-10-22`。
+**批次目录名**统一 `pilot-YYYY-MM-DD`。
+
+> **构件 vs 整栋**：构件级批次（pilot-01 / 02）才走 `gbe-assets/inbox` → intake；整栋 / 整件批次（pilot-05 起）**不拆构件、不入 `kits/`**，归一后的 GLB 交场景侧（模型库 / 下游），本仓只留提示词、报告与处理脚本。
 
 > 没有可用 LOD 的批次不建 `lod/`；坏件进 `out/_archive/<batch>/lod-failed/`。
 
@@ -27,6 +29,43 @@
 6. **report**：写清源/结果 tris、bbox、贴图、材质、已知不足、复跑命令；这是唯一入 Git 的批次说明。
 
 ## 当前批次
+
+### 待生成（图已齐，直接图生 3D）
+
+- `village-ruin-b`（10-25）、`village-school-b`（10-24）、`cave-mouth`（10-23）。
+
+> 按「整栋 / 整件不拆分」口径，出图后按 `docs/REPO-LAYOUT.md` §3 落 `out/pilot-<日期>/refs/<asset>/`。
+
+### 2026-10-26（槐阴村道具与地标）
+
+- 提示词：[`prompts/cn-ancient/pilot-07-village-props.md`](prompts/cn-ancient/pilot-07-village-props.md)
+- 报告：[`reports/PILOT-2026-10-26.md`](reports/PILOT-2026-10-26.md)
+- 产物：`out/pilot-2026-10-26/refs/<asset>/{front,side,top}.png`（10 件 × 3 张 = 30 张，1920×1920；口径为**三张单图分张**，非三格拼图）
+- 原图：`source-images/pilot-2026-10-26/`（30 张定稿 62.4 MB + 淘汰稿 13 张，不入 Git）
+- 3D 成品：仓外模型库 `models/huaiyin/props/`（10 件，已处理；见 `MODEL-INVENTORY.md` 第十节）
+
+### 2026-10-25（槐阴村民居变体）
+
+- 提示词：[`prompts/cn-ancient/pilot-06-village-buildings-b.md`](prompts/cn-ancient/pilot-06-village-buildings-b.md)
+- 报告：[`reports/PILOT-2026-10-25.md`](reports/PILOT-2026-10-25.md)
+- 产物：`out/pilot-2026-10-25/refs/{village-house-b,village-house-c,village-house-d,village-ruin-b}/`（各 3 张，1920×1920；house-b/c/d 是正 / 侧 / 俯，`ruin-b` 是正 / 侧 / 俯 / **背** 四张）
+- 原图：`source-images/pilot-2026-10-25/`（13 张，23.2 MB，不入 Git）
+
+### 2026-10-24（槐阴村整栋不拆分）
+
+- 提示词：[`prompts/cn-ancient/pilot-05-village-whole-buildings.md`](prompts/cn-ancient/pilot-05-village-whole-buildings.md)
+- 报告：[`reports/PILOT-2026-10-24.md`](reports/PILOT-2026-10-24.md)
+- 产物：`out/pilot-2026-10-24/refs/{village-house-a,village-school-b}/`（各正 / 侧 / 俯 3 张，1920×1920）
+- 原图：`source-images/pilot-2026-10-24/`（6 张，约 15 MB，不入 Git）
+
+### 2026-10-23（村落自然与废墟）
+
+- 提示词：[`prompts/cn-ancient/pilot-04-village-nature-ruin.md`](prompts/cn-ancient/pilot-04-village-nature-ruin.md)
+- 报告：[`reports/PILOT-2026-10-23.md`](reports/PILOT-2026-10-23.md)
+- 产物：`out/pilot-2026-10-23/refs/{cave-mouth,school-ruin-4m,old-locust-v2}/`
+- 原图：`source-images/pilot-2026-10-23/`（9 张，约 14 MB，不入 Git）
+
+### 2026-10-22（构件试产）
 
 - 报告：[`reports/PILOT-2026-10-22.md`](reports/PILOT-2026-10-22.md)
 - 产物：`out/pilot-2026-10-22/{refs,normalized,lod,preview}/`
@@ -46,11 +85,9 @@
 | `tools/lod/inspect-glb.js` | 读 GLB 结构：节点、primitive、属性、材质、贴图、bbox |
 | `tools/lod/analyze-mesh.js` | 拓扑体检：连通分量、边界、开闭、高度分布（判断能不能锁边界） |
 
-LOD 工具依赖 `meshoptimizer` + `@gltf-transform/*`，声明在**仓库根** `package.json` 的 `devDependencies`（运行时不依赖；`node_modules` 不入 Git）。首次用先装：
+LOD 工具依赖 `meshoptimizer` + `@gltf-transform/*`，声明在**仓库根** `package.json` 的 `devDependencies`（运行时不依赖）。
 
-```bash
-npm install        # 仓库根
-```
+**本机依赖不放在项目内**：`node_modules` 统一在 `F:\zxc\node_modules`，Node 按父目录查找即可命中（`gbe-studio` → `Project` → `zxc`）。不要在仓库根跑 `npm install`——那会在项目内重建一份；确需重装时，在 `F:\zxc` 维护这份依赖，再回仓库跑测试。
 
 轨 C 用 **Blender 5.2**（headless；本机已有，也可用 bpy 4.5 venv）。脚本只依赖 numpy（Blender 自带），不需要 PIL/scipy。用环境变量指向可执行文件，**Blender/venv 都不进 Git**：
 

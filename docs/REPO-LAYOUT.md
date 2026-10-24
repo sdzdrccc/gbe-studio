@@ -87,7 +87,8 @@ pipeline/
 ```
 
 > 没有可用 LOD 的批次可以没有 `lod/`；坏件进 `out/_archive/<batch>/lod-failed/`，不要交坏 LOD。
-> `pipeline/tools/lod/` 的依赖（`meshoptimizer` + `@gltf-transform/*`）声明在**仓库根** `devDependencies`；先 `npm install`。`node_modules` 不入 Git。
+> `pipeline/tools/lod/` 的依赖（`meshoptimizer` + `@gltf-transform/*`）声明在**仓库根** `devDependencies`。
+> **`node_modules` 不入 Git，也不放项目内**：本机统一放在仓库外的共享父目录（Node 会从项目目录逐级向上查找，能命中）；**不要在仓库根跑 `npm install`**，确需重装时在共享目录维护。
 > 轨 C 的 `retopo-bake.py` 用本机 **Blender 5.2** headless（也可 bpy 4.5 venv；脚本只依赖 numpy，Blender 自带）；路径用 `GBE_BLENDER` 指向，Blender/venv 不入 Git。示例见 `pipeline/README.md`。
 
 **为什么 `source-images/` 不入 Git**：本仓未启用 Git LFS，15 MB 原图进历史会永久膨胀。报告里记录文件名、尺寸、SHA256；真要复现时从图像模型重出。启用 LFS 后再改成入库，并同步本节。
@@ -120,7 +121,7 @@ pipeline/
 | `docs/` · `core/` · `providers/` · `engines/` · `build/` 代码 | `pipeline/source-images/`（暂无 LFS） |
 | `scripts/` · `.github/` · 配置样板 | `build/out/` · `decompose/out/` · `decompose/quarantine/` |
 | `README` · `AGENTS` · `CHANGELOG` · `VERSION` | `runs/` · `jobs/` · `raw/` · `tmp/` · 日志 |
-| — | 凭证、本机配置、`.obsidian/workspace.json` |
+| — | 凭证、本机配置、`.obsidian/workspace.json`、`node_modules/`（放仓库外共享父目录） |
 
 > 判断口诀：**"下次 clone 后，没有它还能不能复跑？"** 能 ⇒ 不进；不能 ⇒ 进。
 
@@ -141,6 +142,8 @@ prompt → source-images → refs → normalized → lod → report → gbe-asse
 | lod | `weld` → `simplify`；**直减毁形时宁可不交 LOD**，用高模并写明；不要交坏 LOD |
 | report | 源/结果 tris、bbox、贴图、材质、已知不足、复跑命令 |
 | inbox | 走 `gbe-assets` 的 intake；本仓不直接写 `kits/` |
+
+> **构件 vs 整栋**：构件级批次（pilot-01 / 02）才走 `gbe-assets/inbox` → intake；整栋 / 整件批次（pilot-05 起）**不拆构件、不入 `kits/`**，归一后的 GLB 交场景侧（模型库 / 下游），本仓只留提示词、报告与处理脚本。
 
 ---
 
@@ -174,3 +177,4 @@ prompt → source-images → refs → normalized → lod → report → gbe-asse
 - `docs/PLAN.md`、`docs/BUILDING-DECOMPOSITION.md` 是长期方案，**不按批次命名**。
 - `gbe-assets/docs/` 的 `DECISIONS.md` / `CONVENTIONS.md` 是跨仓真源，本仓只读。
 - `pipeline/README.md` 与 `pipeline/reports/` 是**批次门牌与报告**，不是长期方案，别搬进 `docs/`。
+- **仓外模型库**：AI 生成或下载的整模、清点报告与预览放在本仓之外（本机在仓库外的模型库目录）；本仓只保留提示词、批次报告与处理脚本，**不把整模拷进仓库**。

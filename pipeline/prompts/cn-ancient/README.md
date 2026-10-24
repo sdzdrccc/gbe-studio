@@ -65,11 +65,33 @@ AI 生成的构件**尺寸是“看起来差不多”**。库里的程序化灰�
 - [檐柱](./pilot-02-yanzhu-round-a.md)
 - [村口老槐](./pilot-03-old-locust-a.md)
 
+> 后续批次：[废洞洞口 / 学堂残垣 4 m](./pilot-04-village-nature-ruin.md)（2026-10-23，报告见 `../../reports/PILOT-2026-10-23.md`）·
+> [槐阴村整栋不拆分（民居整栋 / 学堂半废整栋，三视图分张生成）](./pilot-05-village-whole-buildings.md)（2026-10-24，报告见 `../../reports/PILOT-2026-10-24.md`）·
+> [民居变体（三开间带披屋 / 两开间低矮 / L 形 / 墙基废墟）](./pilot-06-village-buildings-b.md)（2026-10-25，报告见 `../../reports/PILOT-2026-10-25.md`）·
+> [村中道具与地标（院门 / 土地庙 / 井台 / 柴房 / 石碾 / 猪圈 / 农具 / 陶缸 / 溪口石 / 旧山门）](./pilot-07-village-props.md)（2026-10-26，报告见 `../../reports/PILOT-2026-10-26.md`）·
+> [混元文生 3D 提示词（剩余村中物件，A/B 组）](./pilot-08-village-hunyuan-text.md)（直接文生，跳过三视图）。
+
+### 槐阴村 · 全套资产索引
+
+| 资产 | 提示词 | 状态 |
+|---|---|---|
+| 村口老槐 `old-locust-a` | [pilot-03](./pilot-03-old-locust-a.md) | 已有图 / 模型 |
+| 废洞洞口 `cave-mouth` | [pilot-04](./pilot-04-village-nature-ruin.md) | 已有图，待图生 3D |
+| 学堂残垣 4 m `school-ruin-4m` | [pilot-04](./pilot-04-village-nature-ruin.md) | 已有图 |
+| 普通民居 `village-house-a` | [pilot-05](./pilot-05-village-whole-buildings.md) | 已有图 / 模型 |
+| 学堂半废厢房 `village-school-b` | [pilot-05](./pilot-05-village-whole-buildings.md) | 已有图，待图生 3D |
+| 民居 B / C / D `village-house-b/c/d` | [pilot-06](./pilot-06-village-buildings-b.md) | 已有模型 |
+| 墙基废墟 `village-ruin-b` | [pilot-06](./pilot-06-village-buildings-b.md) | 已有图（正 / 侧 / 俯 / 背 四张），待图生 3D |
+| 院门 / 土地庙 / 井台 / 柴房 / 石碾 / 猪圈 / 农具 / 陶缸 / 溪口石 / 旧山门 | [pilot-07](./pilot-07-village-props.md) | 已有图 / 模型（`huaiyin/props/`，10 件） |
+| 剩余村中物件（A/B 组） | [pilot-08](./pilot-08-village-hunyuan-text.md) | 已出模型；文生提示词留档 |
+
+> **不做的**：篱笆 / 晒架（GBE 已有灰模）、地面 / 土路 / 薄田（UE Landscape）、人物 / 牲畜（角色管线）、带字匾额（字必乱）。
+
 ---
 
 ## 3.1 本轮已出的图
 
-横向三视图已生成并拆成单张，落 `../generated-images/pilot-2026-10-22/`（清单与已知不足见该目录 `README.md`）：
+横向三视图已生成并拆成单张，落 `pipeline/out/pilot-2026-10-22/refs/`（`out/` 不入 Git；清单与已知不足见 `pipeline/reports/PILOT-2026-10-22.md`）：
 
 | 资产 | front | side | 第三张 |
 |---|---|---|---|
