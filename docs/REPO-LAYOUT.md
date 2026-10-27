@@ -49,7 +49,7 @@ bridges/  qa/  scripts/  docs/  pipeline/
 | `bridges/` | 端口视图、MCP 桥、Profile | `registry.json` 是产物 | 禁止手改 `registry.json` |
 | `cmd/` | CLI 薄壳（每目录一命令） | 代码 | 每个命令只做参数解析与调用 |
 | `qa/` | QA Gate 留位 | — | 门禁由 `@gbe/schema` 承担 |
-| `scripts/` | 仓库自身工具（版本 / 钩子） | 代码 | `version.js` 与 assets 侧逐字节同步 |
+| `scripts/` | 仓库自身工具（版本 / 钩子） | 代码 | `version.js` 两仓各自维护（共享命令语义一致 · ADR-0009） |
 | `docs/` | 长期方案与规范 | ✅ 文档 | 不放批次报告 |
 | `pipeline/` | 批次产线：提示词 → 图 → GLB → LOD | 见 §3 | 唯一允许放批次产物的域 |
 | `.github/` | CI 工作流 | ✅ | push / PR 三闸门 |

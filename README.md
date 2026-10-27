@@ -206,7 +206,7 @@ npm run hooks:install             # → git config core.hooksPath scripts/hooks
 
 确知不需升版本时（应写明理由）：`GBE_SKIP_VERSION_CHECK=1 git push`
 
-> `scripts/version.js` 与 `gbe-assets/scripts/version.js` **逐字节相同**，改动需双仓同步提交。
+> `scripts/version.js` 与 `gbe-assets/scripts/version.js` **不要求逐字节相同**（**ADR-0009**）：两仓版本各自独立，只保共享子命令的语义一致。
 
 ---
 

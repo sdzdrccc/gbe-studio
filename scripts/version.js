@@ -33,8 +33,8 @@
  *
  * 推荐节奏：bump → git commit → tag → git push --follow-tags
  *
- * 注意：本文件与 `gbe-studio/scripts/version.js` **逐字节相同**。
- *       改动必须双仓同步提交（AGENTS.md §2.6 同提交同步项）。
+ * 注意：本文件与 `gbe-assets/scripts/version.js` **不要求逐字节相同**（ADR-0009）。
+ *       两仓版本各自独立；共享子命令 show/log/bump/check/sync/tag 的语义必须一致。
  */
 
 'use strict';

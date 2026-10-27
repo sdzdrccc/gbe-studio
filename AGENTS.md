@@ -51,7 +51,7 @@
    **禁止**在没有新版本条目的情况下推送（`scripts/hooks/pre-push` 会拦下）。
    段位怎么取见 `CHANGELOG.md` 顶部表；确知不需升版本时用
    `GBE_SKIP_VERSION_CHECK=1 git push`，并在提交信息里写明理由。
-   `scripts/version.js` 与 `gbe-assets` 侧**逐字节相同** —— 改动必须双仓同步提交。
+   `scripts/version.js` 与 `gbe-assets` 侧**不要求逐字节相同**（**ADR-0009**）：两仓版本各自独立；只保共享子命令 `show/log/bump/check/sync/tag` 的语义一致。
 
    **发一版的固定四步**（顺序不能换）：
 
