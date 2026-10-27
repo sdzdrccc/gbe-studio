@@ -3,7 +3,7 @@
 > **GBE = Generative Blender-to-Engine**
 > GBE-Studio 是**生产端**：把「多平台 AI 生成 → 构件拆分 → Blender 精修 → 多引擎落地」做成一条可复用、可复现、可控成本的资产流水线。
 > 本文是**重构方案**，不复用 tbg-3d 的既有结构；tbg-3d 仅作为已验证的原型与经验来源（**只读归档，不迁移**，ADR-0001）。
-> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.5，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
+> **共享约定见 `gbe-assets/docs/CONVENTIONS.md`（v1.7，权威）**：单位/轴心/朝向、尺寸轴序、id·version、契约版本、预算与分类单源、status 与 flags、recipe_hash、材质、许可、成本账本、硬性禁令、**构件分级 §19**、**注册表 §20**。
 > **决策依据见 `gbe-assets/docs/DECISIONS.md`（ADR-0001 ~ ADR-0008）**：存量不迁移 · 不接 Rodin · 混元3D 三通道 · Unity 延后 · MCP 实现可切换 · 构件分级拼装 · 官方 MCP 进注册表但不预设首选 · `$` 前缀键为文档性注释（ADR-0008）。
 > **拆分工序见 [`docs/BUILDING-DECOMPOSITION.md`](./BUILDING-DECOMPOSITION.md)**（场景建筑拆分细化方案）。
 > Studio 精修与打包必须遵守共享约定；**禁止本地另立一套**。
@@ -568,6 +568,9 @@ Godot 386 + Unreal 127（首选实现）+ Blender ~20  ≈ 530+
 
 ## 10. 目录结构
 
+> ★ **目录规范真源：`docs/REPO-LAYOUT.md`**（白名单 / 域目录职责 / 命名 / 入 Git 矩阵）。
+> 本节是**蓝图示意**；两者不一致时**以 `REPO-LAYOUT.md` 为准**（`X-0064` D-2）。
+
 ```text
 gbe-studio/
 ├── SKILL.md                      # 主技能（意图识别 → 流程编排）
@@ -738,4 +741,4 @@ GBE-Studio（生产端）
              GBE-Assets（仓储端）→ Web 浏览（含装配视图）/ REST API / 按引擎下载
 ```
 
-详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.5）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。
+详见 `gbe-assets/docs/PLAN.md`。契约细节以 `gbe-assets/docs/CONVENTIONS.md`（v1.7）为准；拆分工序见 `docs/BUILDING-DECOMPOSITION.md`。
