@@ -51,3 +51,8 @@ jobs:
 
       - name: npm test
         run: npm test
+
+      - name: 三方对账（§9.2 构件表 = forms.js = kit.coverage.planned）
+        env:
+          GBE_ASSETS_REPO: ${{ github.workspace }}/gbe-assets
+        run: node build/convergence/reconcile.js

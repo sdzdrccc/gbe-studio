@@ -23,7 +23,11 @@ const { forms, allParts, heroExclusiveParts, THRESHOLDS } = require('./forms');
 const { readLibrary } = require('./report');
 
 const DOC = path.resolve(__dirname, '../../docs/BUILDING-DECOMPOSITION.md');
-const KIT = path.resolve(__dirname, '../../../gbe-assets/kits/cn-ancient/kit.json');
+// CI 把 gbe-assets checkout 在 workspace/gbe-assets（见 .github/workflows/ci.yml），
+// 与本地「兄弟目录」布局不同 —— 用 GBE_ASSETS_REPO 指路，未设时回退本机默认。
+const KIT = process.env.GBE_ASSETS_REPO
+  ? path.join(process.env.GBE_ASSETS_REPO, 'kits/cn-ancient/kit.json')
+  : path.resolve(__dirname, '../../../gbe-assets/kits/cn-ancient/kit.json');
 
 // ── 解析 markdown 表格 ─────────────────────────────────────────────────────
 function section(text, startRe, endRe) {
